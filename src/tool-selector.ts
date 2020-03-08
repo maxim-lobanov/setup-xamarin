@@ -24,7 +24,7 @@ export abstract class ToolSelector {
             throw new Error("version directory doesn't exist");
         }
 
-        const currentDirectory = path.join(this.versionsDirectoryPath, "Current");
+        const currentDirectory = path.join(this.versionsDirectoryPath, 'Current');
         if (fs.existsSync(currentDirectory)) {
             fs.unlinkSync(currentDirectory);
         }

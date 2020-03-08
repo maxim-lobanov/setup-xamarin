@@ -1,6 +1,6 @@
 import * as path from 'path';
-import { addPath, exportVariable } from '@actions/core';
-import { ToolSelector } from "./tool-selector";
+import {addPath, exportVariable} from '@actions/core';
+import {ToolSelector} from './tool-selector';
 
 export class MonoToolSelector extends ToolSelector {
     protected get basePath(): string {
@@ -12,18 +12,21 @@ export class MonoToolSelector extends ToolSelector {
 
         const versionDirectory = this.getVersionPath(version);
 
-        exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
-            `${versionDirectory}/lib`,
-            '/lib',
-            '/usr/lib',
-            process.env['DYLD_LIBRARY_FALLBACK_PATH']
-        ].join(path.delimiter));
+        exportVariable(
+            'DYLD_LIBRARY_FALLBACK_PATH',
+            [`${versionDirectory}/lib`, '/lib', '/usr/lib', process.env['DYLD_LIBRARY_FALLBACK_PATH']].join(
+                path.delimiter
+            )
+        );
 
-        exportVariable('PKG_CONFIG_PATH', [
-            `${versionDirectory}/lib/pkgconfig`,
-            `${versionDirectory}/share/pkgconfig`,
-            process.env['PKG_CONFIG_PATH']
-        ].join(path.delimiter));
+        exportVariable(
+            'PKG_CONFIG_PATH',
+            [
+                `${versionDirectory}/lib/pkgconfig`,
+                `${versionDirectory}/share/pkgconfig`,
+                process.env['PKG_CONFIG_PATH']
+            ].join(path.delimiter)
+        );
 
         addPath(`${versionDirectory}/bin`);
     }
