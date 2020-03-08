@@ -7,7 +7,7 @@ async function run() {
   try {
     const xamarinVersionsDir = path.join(XamarinIOSDirectoryPath, VersionRelativeDir);
     const children: string[] = fs.readdirSync(xamarinVersionsDir);
-    for (const child in children) {
+    for (const child of children) {
       console.log(child);
     }
   } catch (error) {
