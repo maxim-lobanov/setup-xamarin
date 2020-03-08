@@ -96,7 +96,7 @@ function run() {
         try {
             const xamarinVersionsDir = path.join(constants_1.XamarinIOSDirectoryPath, constants_1.VersionRelativeDir);
             const children = fs.readdirSync(xamarinVersionsDir);
-            for (const child in children) {
+            for (const child of children) {
                 console.log(child);
             }
         }
