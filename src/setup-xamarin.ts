@@ -27,6 +27,9 @@ async function run() {
         // platform check
         console.log(process.platform);
 
+        const sel = new XamarinIosToolSelector();
+        sel.getAllVersions().forEach(w => console.log(w));
+
         invokeSelector('mono-version', MonoToolSelector);
         invokeSelector('xamarin-ios-version', XamarinIosToolSelector);
         invokeSelector('xamarin-mac-version', XamarinMacToolSelector);

@@ -6,6 +6,18 @@ describe('Version matcher tests', () => {
         '2.3.8',
         '3.2.0'
     ];
+
+    describe('Partial version', () => {
+        
+    });
+
+    describe('.x format', () => {
+
+    });
+
+    describe('Full version', () => {
+
+    });
     const result = matchVersion(availableVersions, '2.3.x');
     expect(result).toBe('2.3.8');
 });

@@ -333,6 +333,9 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // platform check
+            console.log(process.platform);
+            const sel = new xamarin_ios_selector_1.XamarinIosToolSelector();
+            sel.getAllVersions().forEach(w => console.log(w));
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
