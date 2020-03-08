@@ -1701,7 +1701,7 @@ function run() {
             const xamarinVersionsDir = path.join(constants_1.XamarinIOSDirectoryPath, constants_1.VersionRelativeDir);
             const children = fs.readdirSync(xamarinVersionsDir);
             for (const child of children) {
-                const valid = semver.valid(child);
+                const valid = semver.valid(child) !== null;
                 console.log(`${child}: ${valid}`);
             }
         }

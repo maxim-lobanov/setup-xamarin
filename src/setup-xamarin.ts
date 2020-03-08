@@ -9,7 +9,7 @@ async function run() {
     const xamarinVersionsDir = path.join(XamarinIOSDirectoryPath, VersionRelativeDir);
     const children: string[] = fs.readdirSync(xamarinVersionsDir);
     for (const child of children) {
-        const valid = semver.valid(child);
+        const valid = semver.valid(child) !== null;
         console.log(`${child}: ${valid}`);
     }
   } catch (error) {
