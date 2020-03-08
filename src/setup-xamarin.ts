@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as core from '@actions/core';
 import {VersionRelativeDir, XamarinIOSDirectoryPath} from './constants';
-import * as semver from 'semver';
+import semver from 'semver';
 
 async function run() {
   try {

@@ -1689,19 +1689,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(__webpack_require__(622));
 const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const constants_1 = __webpack_require__(32);
-const semver = __importStar(__webpack_require__(280));
+const semver_1 = __importDefault(__webpack_require__(280));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const xamarinVersionsDir = path.join(constants_1.XamarinIOSDirectoryPath, constants_1.VersionRelativeDir);
             const children = fs.readdirSync(xamarinVersionsDir);
             for (const child of children) {
-                const valid = semver.valid(child) !== null;
+                const valid = semver_1.default.valid(child) !== null;
                 console.log(`${child}: ${valid}`);
             }
         }
