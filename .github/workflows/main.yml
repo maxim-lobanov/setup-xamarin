@@ -1,0 +1,9 @@
+on: [push]
+
+jobs:
+  setup-xamarin:
+    runs-on: macos-latest
+    name: Validate setup-xamarin task
+    steps:
+    - name: setup-xamarin
+      uses: maxim-lobanov/setup-xamarin@implement-first-version
