@@ -1,6 +1,6 @@
 import * as path from 'path';
-import {addPath, exportVariable} from '@actions/core';
-import {ToolSelector} from './tool-selector';
+import { addPath, exportVariable } from '@actions/core';
+import { ToolSelector } from './tool-selector';
 
 export class MonoToolSelector extends ToolSelector {
     protected get basePath(): string {

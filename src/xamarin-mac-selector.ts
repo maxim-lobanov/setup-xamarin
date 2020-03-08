@@ -1,4 +1,4 @@
-import {ToolSelector} from './tool-selector';
+import { ToolSelector } from './tool-selector';
 
 export class XamarinMacToolSelector extends ToolSelector {
     protected get basePath(): string {

@@ -1,6 +1,15 @@
 name: 'Setup Xamarin'
 description: 'Set up your GitHub Actions workflow with a specific version of Xamarin & Mono'
 author: 'Maxim Lobanov'
+inputs:
+  mono-version:
+    description: 'Version of Mono to select'
+  xamarin-ios-version:
+    description: 'Version of Xamarin.iOS to select'
+  xamarin-mac-version:
+    description: 'Version of Xamarin.Mac to select'
+  xamarin-android-version:
+    description: 'Version of Xamarin.Android to select'
 runs:
   using: 'node12'
   main: 'dist/index.js'

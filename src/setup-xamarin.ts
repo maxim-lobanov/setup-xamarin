@@ -1,20 +1,20 @@
 import * as core from '@actions/core';
-import {MonoToolSelector} from './mono-selector';
-import {XamarinIosToolSelector} from './xamarin-ios-selector';
-import {XamarinMacToolSelector} from './xamarin-mac-selector';
-import {XamarinAndroidToolSelector} from './xamarin-android-selector';
-import {ToolSelector} from './tool-selector';
-import {findVersion} from './version-matcher';
+import { MonoToolSelector } from './mono-selector';
+import { XamarinIosToolSelector } from './xamarin-ios-selector';
+import { XamarinMacToolSelector } from './xamarin-mac-selector';
+import { XamarinAndroidToolSelector } from './xamarin-android-selector';
+import { ToolSelector } from './tool-selector';
+import { matchVersion } from './version-matcher';
 
-const invokeSelector = (variableName: string, selectorClass: {new (): ToolSelector}): void => {
-    const versionSpec = core.getInput(variableName, {required: false});
+const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelector }): void => {
+    const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
         return;
     }
 
     const selector = new selectorClass();
     const availableVersions = selector.getAllVersions();
-    const targetVersion = findVersion(availableVersions, versionSpec);
+    const targetVersion = matchVersion(availableVersions, versionSpec);
     if (!targetVersion) {
         throw new Error('Impossible to find target version');
     }
@@ -25,6 +25,7 @@ const invokeSelector = (variableName: string, selectorClass: {new (): ToolSelect
 async function run() {
     try {
         // platform check
+        console.log(process.platform);
 
         invokeSelector('mono-version', MonoToolSelector);
         invokeSelector('xamarin-ios-version', XamarinIosToolSelector);

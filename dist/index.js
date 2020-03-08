@@ -102,7 +102,7 @@ class ToolSelector {
         if (!fs.existsSync(versionDirectory)) {
             throw new Error("version directory doesn't exist");
         }
-        const currentDirectory = path.join(this.versionsDirectoryPath, "Current");
+        const currentDirectory = path.join(this.versionsDirectoryPath, 'Current');
         if (fs.existsSync(currentDirectory)) {
             fs.unlinkSync(currentDirectory);
         }
@@ -154,12 +154,7 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
     setVersion(version) {
         super.setVersion(version);
         const versionDirectory = this.getVersionPath(version);
-        core_1.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
-            `${versionDirectory}/lib`,
-            '/lib',
-            '/usr/lib',
-            process.env['DYLD_LIBRARY_FALLBACK_PATH']
-        ].join(path.delimiter));
+        core_1.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [`${versionDirectory}/lib`, '/lib', '/usr/lib', process.env['DYLD_LIBRARY_FALLBACK_PATH']].join(path.delimiter));
         core_1.exportVariable('PKG_CONFIG_PATH', [
             `${versionDirectory}/lib/pkgconfig`,
             `${versionDirectory}/share/pkgconfig`,
@@ -328,7 +323,7 @@ const invokeSelector = (variableName, selectorClass) => {
     }
     const selector = new selectorClass();
     const availableVersions = selector.getAllVersions();
-    const targetVersion = version_matcher_1.findVersion(availableVersions, versionSpec);
+    const targetVersion = version_matcher_1.matchVersion(availableVersions, versionSpec);
     if (!targetVersion) {
         throw new Error('Impossible to find target version');
     }
@@ -691,7 +686,7 @@ module.exports = require("fs");
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findVersion = (availableVersions, versionSpec) => {
+exports.matchVersion = (availableVersions, versionSpec) => {
     return availableVersions.find(ver => ver === versionSpec);
 };
 
