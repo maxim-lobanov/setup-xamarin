@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import { addPath, exportVariable } from '@actions/core';
 import { ToolSelector } from "./tool-selector";
