@@ -6,4 +6,5 @@ jobs:
     name: Validate setup-xamarin task
     steps:
     - name: setup-xamarin
+      id: test
       uses: maxim-lobanov/setup-xamarin@implement-first-version
