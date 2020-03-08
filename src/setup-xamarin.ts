@@ -4,10 +4,7 @@ import { XamarinIosToolSelector } from './xamarin-ios-selector';
 import { XamarinMacToolSelector } from './xamarin-mac-selector';
 import { XamarinAndroidToolSelector } from './xamarin-android-selector';
 import { ToolSelector } from './tool-selector';
-
-const findVersion = (availableVersions: string[], versionSpec: string): string | undefined => {
-  return availableVersions.find(ver => ver === versionSpec);
-}
+import { findVersion } from './version-matcher';
 
 const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelector }): void => {
   const versionSpec = core.getInput(variableName, { required: false });
@@ -27,6 +24,8 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
 
 async function run() {
   try {
+    // platform check
+
     invokeSelector('mono-version', MonoToolSelector);
     invokeSelector('xamarin-ios-version', XamarinIosToolSelector);
     invokeSelector('xamarin-mac-version', XamarinMacToolSelector);

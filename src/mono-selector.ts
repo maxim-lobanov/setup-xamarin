@@ -12,20 +12,18 @@ export class MonoToolSelector extends ToolSelector {
 
         const versionDirectory = this.getVersionPath(version);
 
-        const dyldFallbackLibraryPath = [
+        exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
             `${versionDirectory}/lib`,
             '/lib',
             '/usr/lib',
             process.env['DYLD_LIBRARY_FALLBACK_PATH']
-        ].join(path.delimiter);
-        exportVariable('DYLD_LIBRARY_FALLBACK_PATH', dyldFallbackLibraryPath);
+        ].join(path.delimiter));
 
-        const pkgConfigPath = [
+        exportVariable('PKG_CONFIG_PATH', [
             `${versionDirectory}/lib/pkgconfig`,
             `${versionDirectory}/share/pkgconfig`,
             process.env['PKG_CONFIG_PATH']
-        ].join(path.delimiter);
-        exportVariable('PKG_CONFIG_PATH', pkgConfigPath);
+        ].join(path.delimiter));
 
         addPath(`${versionDirectory}/bin`);
     }

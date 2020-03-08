@@ -154,19 +154,17 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
     setVersion(version) {
         super.setVersion(version);
         const versionDirectory = this.getVersionPath(version);
-        const dyldFallbackLibraryPath = [
+        core_1.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
             `${versionDirectory}/lib`,
             '/lib',
             '/usr/lib',
             process.env['DYLD_LIBRARY_FALLBACK_PATH']
-        ].join(path.delimiter);
-        core_1.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', dyldFallbackLibraryPath);
-        const pkgConfigPath = [
+        ].join(path.delimiter));
+        core_1.exportVariable('PKG_CONFIG_PATH', [
             `${versionDirectory}/lib/pkgconfig`,
             `${versionDirectory}/share/pkgconfig`,
             process.env['PKG_CONFIG_PATH']
-        ].join(path.delimiter);
-        core_1.exportVariable('PKG_CONFIG_PATH', pkgConfigPath);
+        ].join(path.delimiter));
         core_1.addPath(`${versionDirectory}/bin`);
     }
 }
@@ -322,9 +320,7 @@ const mono_selector_1 = __webpack_require__(220);
 const xamarin_ios_selector_1 = __webpack_require__(497);
 const xamarin_mac_selector_1 = __webpack_require__(116);
 const xamarin_android_selector_1 = __webpack_require__(182);
-const findVersion = (availableVersions, versionSpec) => {
-    return availableVersions.find(ver => ver === versionSpec);
-};
+const version_matcher_1 = __webpack_require__(846);
 const invokeSelector = (variableName, selectorClass) => {
     const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
@@ -332,7 +328,7 @@ const invokeSelector = (variableName, selectorClass) => {
     }
     const selector = new selectorClass();
     const availableVersions = selector.getAllVersions();
-    const targetVersion = findVersion(availableVersions, versionSpec);
+    const targetVersion = version_matcher_1.findVersion(availableVersions, versionSpec);
     if (!targetVersion) {
         throw new Error('Impossible to find target version');
     }
@@ -341,6 +337,7 @@ const invokeSelector = (variableName, selectorClass) => {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // platform check
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
@@ -685,6 +682,19 @@ module.exports = require("path");
 /***/ (function(module) {
 
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 846:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.findVersion = (availableVersions, versionSpec) => {
+    return availableVersions.find(ver => ver === versionSpec);
+};
+
 
 /***/ })
 
