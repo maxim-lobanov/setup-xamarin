@@ -43,6 +43,21 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
+/***/ 32:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MonoDirectoryPath = '/Library/Frameworks/Mono.framework';
+exports.XamarinIOSDirectoryPath = '/Library/Frameworks/Xamarin.iOS.framework';
+exports.XamarinAndroidDirectoryPath = '/Library/Frameworks/Xamarin.Android.framework';
+exports.XamarinMacDirectoryPath = '/Library/Frameworks/Xamarin.Mac.framework';
+exports.VersionRelativeDir = 'Versions';
+
+
+/***/ }),
+
 /***/ 87:
 /***/ (function(module) {
 
@@ -72,11 +87,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = __importStar(__webpack_require__(622));
+const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
+const constants_1 = __webpack_require__(32);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log("test 1");
+            const xamarinVersionsDir = path.join(constants_1.XamarinIOSDirectoryPath, constants_1.VersionRelativeDir);
+            const children = fs.readdirSync(xamarinVersionsDir);
+            for (const child in children) {
+                console.log(child);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
@@ -393,6 +415,13 @@ exports.getState = getState;
 /***/ (function(module) {
 
 module.exports = require("path");
+
+/***/ }),
+
+/***/ 747:
+/***/ (function(module) {
+
+module.exports = require("fs");
 
 /***/ })
 
