@@ -1,0 +1,6 @@
+name: 'Setup Xamarin'
+description: 'Set up your GitHub Actions workflow with a specific version of Xamarin & Mono'
+author: 'Maxim Lobanov'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

@@ -8,7 +8,6 @@
     "build": "tsc && ncc build",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
-    "clean-devdeps": "rm -rf node_modules/ & npm install --only=prod",
     "pre-checkin": "npm run format && npm run build"
   },
   "repository": {
