@@ -1,16 +1,35 @@
-import * as path from 'path';
-import * as fs from 'fs';
 import * as core from '@actions/core';
-import {VersionRelativeDir, XamarinIOSDirectoryPath} from './constants';
-import semver from 'semver';
+import { MonoToolSelector } from './mono-selector';
+import { XamarinIosToolSelector } from './xamarin-ios-selector';
+import { XamarinMacToolSelector } from './xamarin-mac-selector';
+import { XamarinAndroidToolSelector } from './xamarin-android-selector';
+import { ToolSelector } from './tool-selector';
+
+type SelectorResult = [ToolSelector, string];
+type SelectorClass = { new (): ToolSelector };
+
+const createToolSelector = (variableName: string, selectorClass: SelectorClass): SelectorResult | null => {
+  const versionSpec = core.getInput(variableName, { required: false });
+  if (!versionSpec) {
+    return null;
+  }
+
+  return [new selectorClass(), versionSpec];
+}
 
 async function run() {
   try {
-    const xamarinVersionsDir = path.join(XamarinIOSDirectoryPath, VersionRelativeDir);
-    const children: string[] = fs.readdirSync(xamarinVersionsDir);
-    for (const child of children) {
-        const valid = semver.valid(child) !== null;
-        console.log(`${child}: ${valid}`);
+    const selectors = [
+      createToolSelector('mono-version', MonoToolSelector),
+      createToolSelector('xamarin-ios-version', XamarinIosToolSelector),
+      createToolSelector('xamarin-mac-version', XamarinMacToolSelector),
+      createToolSelector('xamarin-android-version', XamarinAndroidToolSelector),
+    ].filter((sel): sel is SelectorResult => sel !== null);
+
+    for (const [selector, version] of selectors) {
+      const availableVersions = selector.getAllVersions();
+      const targetVersion = availableVersions[0];
+      selector.setVersion(targetVersion);
     }
   } catch (error) {
     core.setFailed(error.message);
