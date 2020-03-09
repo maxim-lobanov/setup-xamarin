@@ -133,7 +133,7 @@ class ToolSelector {
             res.output.forEach(w => console.log(w));
             fs.readdirSync(this.versionsDirectoryPath).forEach(w => console.log(w.toString()));
         }
-        fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
+        fs.symlinkSync(targetVersionDirectory, currentVersionDirectory);
     }
 }
 exports.ToolSelector = ToolSelector;

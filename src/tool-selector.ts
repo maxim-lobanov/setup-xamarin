@@ -47,6 +47,6 @@ export abstract class ToolSelector {
             fs.readdirSync(this.versionsDirectoryPath).forEach(w => console.log(w.toString()));
         }
 
-        fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
+        fs.symlinkSync(targetVersionDirectory, currentVersionDirectory);
     }
 }
