@@ -35,7 +35,7 @@ export const matchVersion = (availableVersions: string[], versionSpec: string): 
         return null;
     }
 
-    const sortedVersions = availableVersions.sort(compareVersions).reverse();
+    const sortedVersions = [...availableVersions].sort(compareVersions).reverse();
     const version = sortedVersions.find(ver => compareVersions.compare(ver, normalizedVersionSpec, '='));
     if (version) {
         return version;

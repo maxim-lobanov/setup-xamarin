@@ -759,7 +759,7 @@ exports.invokeCommandSync = (command, args, sudo) => {
     }
     if (execResult.status !== 0) {
         throw new Error([
-            `Error during run ${sudo ? 'sudo' : ''} ${command} ${args.join(' ')}`,
+            `Error during run ${sudo ? 'sudo ' : ''}${command} ${args.join(' ')}`,
             execResult.stderr,
             execResult.stdout
         ].join(os_1.EOL));
@@ -821,7 +821,7 @@ exports.matchVersion = (availableVersions, versionSpec) => {
     if (!normalizedVersionSpec) {
         return null;
     }
-    const sortedVersions = availableVersions.sort(compare_versions_1.default).reverse();
+    const sortedVersions = [...availableVersions].sort(compare_versions_1.default).reverse();
     const version = sortedVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='));
     if (version) {
         return version;
