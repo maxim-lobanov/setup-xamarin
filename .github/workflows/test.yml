@@ -35,11 +35,8 @@ jobs:
         xamarin-mac-version: 6.6.0.12
         xamarin-android-version: 10.1.3.7
 
-    - name: Test
-      run: pwd && ls
-
     - name: Validate versions
-      run: ./__tests__/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3.7'
+      run: ./__tests__/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3'
 
   setup-xamarin-invalid-version:
     runs-on: macos-latest
