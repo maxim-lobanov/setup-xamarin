@@ -11,26 +11,33 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
     if (!versionSpec) {
         return;
     }
-    const normalizedVersionSpec = normalizeVersion(versionSpec);
-    if (!normalizedVersionSpec) {
-        throw new Error('Invalid version');
-    }
 
     const selector = new selectorClass();
+    core.info(`Switch ${selector.toolName} to version ${versionSpec}`);
+
+    const normalizedVersionSpec = normalizeVersion(versionSpec);
+    if (!normalizedVersionSpec) {
+        throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
+    }
+    core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
+
     const availableVersions = selector.getAllVersions();
 
     const targetVersion = matchVersion(availableVersions, normalizedVersionSpec);
     if (!targetVersion) {
-        throw new Error('Impossible to find target version');
+        core.info('Available versions:');
+        availableVersions.forEach(ver => core.info(`- ${ver}`));
+        throw new Error(`Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`);
     }
 
     selector.setVersion(targetVersion);
+    core.info('Switched');
 };
 
 async function run() {
     try {
         if (process.platform !== 'darwin') {
-            throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
+            throw new Error(`This task is intended only for macOS system. It can't be run on '${process.platform}' platform`);
         }
 
         invokeSelector('mono-version', MonoToolSelector);

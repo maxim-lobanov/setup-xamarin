@@ -6,8 +6,8 @@ import { XamarinMacToolSelector } from '../src/xamarin-mac-selector';
 import { XamarinAndroidToolSelector } from '../src/xamarin-android-selector';
 import { ToolSelector } from '../src/tool-selector';
 
-const selectors: { new(): ToolSelector }[] = [
-    MonoToolSelector,
+const selectors: { new (): ToolSelector }[] = [
+    MonoToolSelector, //
     XamarinIosToolSelector,
     XamarinMacToolSelector,
     XamarinAndroidToolSelector
@@ -40,7 +40,7 @@ selectors.forEach(selector => {
                     'Latest'
                 ]);
             });
-        
+
             afterEach(() => {
                 jest.resetAllMocks();
                 jest.clearAllMocks();
@@ -49,10 +49,10 @@ selectors.forEach(selector => {
             it('versions are filtered correctly', () => {
                 const sel = new selector();
                 const expectedVersions = [
-                    '13.4.0.2',
+                    '13.4.0.2', //
                     '13.6.0.12',
                     '13.8.3.0',
-                    '13.10.0.21',
+                    '13.10.0.21'
                 ];
                 expect(sel.getAllVersions()).toEqual(expectedVersions);
             });
@@ -68,7 +68,7 @@ selectors.forEach(selector => {
                 fsSymlinkSpy = jest.spyOn(fs, 'symlinkSync');
                 fsUnlinkSpy = jest.spyOn(fs, 'unlinkSync');
             });
-        
+
             afterEach(() => {
                 jest.resetAllMocks();
                 jest.clearAllMocks();
@@ -114,7 +114,7 @@ describe('MonoToolSelector', () => {
             coreAddPathSpy = jest.spyOn(core, 'addPath');
             fsExistsSpy = jest.spyOn(fs, 'existsSync');
         });
-    
+
         afterEach(() => {
             jest.resetAllMocks();
             jest.clearAllMocks();
@@ -125,8 +125,14 @@ describe('MonoToolSelector', () => {
 
             const sel = new MonoToolSelector();
             sel.setVersion('1.2.3.4');
-            expect(coreExportVariableSpy).toHaveBeenCalledWith('DYLD_LIBRARY_FALLBACK_PATH', `/Library/Frameworks/Mono.framework/Versions/1.2.3.4/lib:/lib:/usr/lib:${process.env['DYLD_LIBRARY_FALLBACK_PATH'] ?? ''}`);
-            expect(coreExportVariableSpy).toHaveBeenCalledWith('PKG_CONFIG_PATH', `/Library/Frameworks/Mono.framework/Versions/1.2.3.4/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/1.2.3.4/share/pkgconfig:${process.env['PKG_CONFIG_PATH'] ?? ''}`);
+            expect(coreExportVariableSpy).toHaveBeenCalledWith(
+                'DYLD_LIBRARY_FALLBACK_PATH',
+                `/Library/Frameworks/Mono.framework/Versions/1.2.3.4/lib:/lib:/usr/lib:${process.env['DYLD_LIBRARY_FALLBACK_PATH'] ?? ''}`
+            );
+            expect(coreExportVariableSpy).toHaveBeenCalledWith(
+                'PKG_CONFIG_PATH',
+                `/Library/Frameworks/Mono.framework/Versions/1.2.3.4/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/1.2.3.4/share/pkgconfig:${process.env['PKG_CONFIG_PATH'] ?? ''}`
+            );
             expect(coreAddPathSpy).toHaveBeenCalledWith('/Library/Frameworks/Mono.framework/Versions/1.2.3.4/bin');
         });
     });

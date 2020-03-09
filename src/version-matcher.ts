@@ -1,4 +1,4 @@
-import compareVersions from "compare-versions";
+import compareVersions from 'compare-versions';
 
 export const normalizeVersion = (version: string): string | null => {
     if (!compareVersions.validate(version)) {
@@ -6,7 +6,9 @@ export const normalizeVersion = (version: string): string | null => {
     }
 
     const parts = version.split('.');
-    while (parts.length < 4) { parts.push('x'); }
+    while (parts.length < 4) {
+        parts.push('x');
+    }
     return parts.join('.');
 };
 

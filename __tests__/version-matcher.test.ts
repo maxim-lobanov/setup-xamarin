@@ -3,7 +3,7 @@ import { matchVersion, normalizeVersion } from '../src/version-matcher';
 describe('Version matcher tests', () => {
     describe('matchVersion', () => {
         const availableVersions = [
-            '13.2.0.47',
+            '13.2.0.47', //
             '13.4.0.2',
             '13.6.0.12',
             '13.8.2.9',
@@ -19,12 +19,12 @@ describe('Version matcher tests', () => {
                 const matchedVersion = matchVersion(availableVersions, '14');
                 expect(matchedVersion).toBe('14.0.2.1');
             });
-    
+
             it('is matched and latest version is selected', () => {
                 const matchedVersion = matchVersion(availableVersions, '13');
                 expect(matchedVersion).toBe('13.10.0.21');
             });
-    
+
             it('is not matched', () => {
                 const matchedVersion = matchVersion(availableVersions, '11');
                 expect(matchedVersion).toBeNull();
@@ -36,7 +36,7 @@ describe('Version matcher tests', () => {
                 const matchedVersion = matchVersion(availableVersions, '14.0');
                 expect(matchedVersion).toBe('14.0.2.1');
             });
-    
+
             it('are matched and latest version is selected', () => {
                 const matchedVersion = matchVersion(availableVersions, '13.8');
                 expect(matchedVersion).toBe('13.8.3.2');

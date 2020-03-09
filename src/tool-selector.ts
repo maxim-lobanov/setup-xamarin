@@ -1,9 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as core from '@actions/core';
 import compareVersions from 'compare-versions';
 import { normalizeVersion } from './version-matcher';
 
 export abstract class ToolSelector {
+    public abstract get toolName(): string;
     protected abstract get basePath(): string;
 
     protected get versionsDirectoryPath(): string {
@@ -25,16 +27,17 @@ export abstract class ToolSelector {
     }
 
     public setVersion(version: string): void {
-        const versionDirectory = this.getVersionPath(version);
-        if (!fs.existsSync(versionDirectory)) {
-            throw new Error("version directory doesn't exist");
+        const targetVersionDirectory = this.getVersionPath(version);
+        if (!fs.existsSync(targetVersionDirectory)) {
+            throw new Error(`Invalid version: Directory '${targetVersionDirectory}' doesn't exist`);
         }
 
-        const currentDirectory = path.join(this.versionsDirectoryPath, 'Current');
-        if (fs.existsSync(currentDirectory)) {
-            fs.unlinkSync(currentDirectory);
+        const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
+        core.debug(`Creating symlink '${targetVersionDirectory}' -> '${currentVersionDirectory}'`)
+        if (fs.existsSync(currentVersionDirectory)) {
+            fs.unlinkSync(currentVersionDirectory);
         }
 
-        fs.symlinkSync(currentDirectory, versionDirectory);
+        fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
     }
 }

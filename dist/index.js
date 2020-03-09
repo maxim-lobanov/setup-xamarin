@@ -58,6 +58,9 @@ module.exports = require("os");
 Object.defineProperty(exports, "__esModule", { value: true });
 const tool_selector_1 = __webpack_require__(136);
 class XamarinMacToolSelector extends tool_selector_1.ToolSelector {
+    get toolName() {
+        return 'Xamarin.Mac';
+    }
     get basePath() {
         return '/Library/Frameworks/Xamarin.Mac.framework';
     }
@@ -85,6 +88,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
 const compare_versions_1 = __importDefault(__webpack_require__(247));
 const version_matcher_1 = __webpack_require__(846);
 class ToolSelector {
@@ -103,15 +107,16 @@ class ToolSelector {
         return potentialVersions.sort(compare_versions_1.default);
     }
     setVersion(version) {
-        const versionDirectory = this.getVersionPath(version);
-        if (!fs.existsSync(versionDirectory)) {
-            throw new Error("version directory doesn't exist");
+        const targetVersionDirectory = this.getVersionPath(version);
+        if (!fs.existsSync(targetVersionDirectory)) {
+            throw new Error(`Invalid version: Directory '${targetVersionDirectory}' doesn't exist`);
         }
-        const currentDirectory = path.join(this.versionsDirectoryPath, 'Current');
-        if (fs.existsSync(currentDirectory)) {
-            fs.unlinkSync(currentDirectory);
+        const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
+        core.debug(`Creating symlink '${targetVersionDirectory}' -> '${currentVersionDirectory}'`);
+        if (fs.existsSync(currentVersionDirectory)) {
+            fs.unlinkSync(currentVersionDirectory);
         }
-        fs.symlinkSync(currentDirectory, versionDirectory);
+        fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
     }
 }
 exports.ToolSelector = ToolSelector;
@@ -127,6 +132,9 @@ exports.ToolSelector = ToolSelector;
 Object.defineProperty(exports, "__esModule", { value: true });
 const tool_selector_1 = __webpack_require__(136);
 class XamarinAndroidToolSelector extends tool_selector_1.ToolSelector {
+    get toolName() {
+        return 'Xamarin.Android';
+    }
     get basePath() {
         return '/Library/Frameworks/Xamarin.Android.framework';
     }
@@ -150,22 +158,33 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(__webpack_require__(622));
-const core_1 = __webpack_require__(470);
+const core = __importStar(__webpack_require__(470));
 const tool_selector_1 = __webpack_require__(136);
 class MonoToolSelector extends tool_selector_1.ToolSelector {
+    get toolName() {
+        return 'Mono';
+    }
     get basePath() {
         return '/Library/Frameworks/Mono.framework';
     }
     setVersion(version) {
         super.setVersion(version);
         const versionDirectory = this.getVersionPath(version);
-        core_1.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [`${versionDirectory}/lib`, '/lib', '/usr/lib', process.env['DYLD_LIBRARY_FALLBACK_PATH']].join(path.delimiter));
-        core_1.exportVariable('PKG_CONFIG_PATH', [
+        core.debug('Update DYLD_LIBRARY_FALLBACK_PATH environment variable');
+        core.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
+            `${versionDirectory}/lib`,
+            '/lib',
+            '/usr/lib',
+            process.env['DYLD_LIBRARY_FALLBACK_PATH']
+        ].join(path.delimiter));
+        core.debug('Update PKG_CONFIG_PATH environment variable');
+        core.exportVariable('PKG_CONFIG_PATH', [
             `${versionDirectory}/lib/pkgconfig`,
             `${versionDirectory}/share/pkgconfig`,
             process.env['PKG_CONFIG_PATH']
         ].join(path.delimiter));
-        core_1.addPath(`${versionDirectory}/bin`);
+        core.debug(`Add '${versionDirectory}/bin' to PATH`);
+        core.addPath(`${versionDirectory}/bin`);
     }
 }
 exports.MonoToolSelector = MonoToolSelector;
@@ -326,23 +345,28 @@ const invokeSelector = (variableName, selectorClass) => {
     if (!versionSpec) {
         return;
     }
+    const selector = new selectorClass();
+    core.info(`Switch ${selector.toolName} to version ${versionSpec}`);
     const normalizedVersionSpec = version_matcher_1.normalizeVersion(versionSpec);
     if (!normalizedVersionSpec) {
-        throw new Error('Invalid version');
+        throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
-    const selector = new selectorClass();
+    core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
     const availableVersions = selector.getAllVersions();
     const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec);
     if (!targetVersion) {
-        throw new Error('Impossible to find target version');
+        core.info('Available versions:');
+        availableVersions.forEach(ver => core.info(`- ${ver}`));
+        throw new Error(`Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`);
     }
     selector.setVersion(targetVersion);
+    core.info('Switched');
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (process.platform !== 'darwin') {
-                throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
+                throw new Error(`This task is intended only for macOS system. It can't be run on '${process.platform}' platform`);
             }
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
@@ -668,6 +692,9 @@ exports.getState = getState;
 Object.defineProperty(exports, "__esModule", { value: true });
 const tool_selector_1 = __webpack_require__(136);
 class XamarinIosToolSelector extends tool_selector_1.ToolSelector {
+    get toolName() {
+        return 'Xamarin.iOS';
+    }
     get basePath() {
         return '/Library/Frameworks/Xamarin.iOS.framework';
     }
