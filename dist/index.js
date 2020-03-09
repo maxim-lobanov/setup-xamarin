@@ -95,7 +95,8 @@ class ToolSelector {
     }
     getAllVersions() {
         const potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
-        return potentialVersions.filter(child => compare_versions_1.default.validate(child));
+        const versions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
+        return versions.sort(compare_versions_1.default);
     }
     setVersion(version) {
         const versionDirectory = this.getVersionPath(version);
@@ -310,6 +311,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const mono_selector_1 = __webpack_require__(220);
 const xamarin_ios_selector_1 = __webpack_require__(497);
@@ -339,8 +341,8 @@ function run() {
             if (process.platform !== 'darwin') {
                 throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
             }
-            const sel = new xamarin_ios_selector_1.XamarinIosToolSelector();
-            sel.getAllVersions().forEach(w => console.log(w));
+            const versions = fs.readdirSync('/Library/Frameworks/Xamarin.iOS.framework');
+            versions.forEach(w => console.log(w));
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);

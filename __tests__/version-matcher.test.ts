@@ -93,24 +93,6 @@ describe('Version matcher tests', () => {
         });
     });
 
-    describe('validateVersion', () => {
-        it('valid version', () => {
-            expect(validateVersion('1.2.3')).toBeTruthy();
-        });
-
-        it('invalid version', () => {
-            expect(validateVersion('a.b.c.d')).toBeFalsy();
-        });
-
-        it('five digits', () => {
-            expect(validateVersion('1.2.3.4.5')).toBeFalsy();
-        });
-
-        it('empty string', () => {
-            expect(validateVersion('')).toBeFalsy();
-        });
-    });
-
     describe('normalizeVersion', () => {
         it('one digit', () => {
             expect(normalizeVersion('4')).toBe('4.x.x.x');

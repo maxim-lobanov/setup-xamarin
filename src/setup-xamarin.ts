@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as core from '@actions/core';
 import { MonoToolSelector } from './mono-selector';
 import { XamarinIosToolSelector } from './xamarin-ios-selector';
@@ -33,8 +34,8 @@ async function run() {
             throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
         }
 
-        const sel = new XamarinIosToolSelector();
-        sel.getAllVersions().forEach(w => console.log(w));
+        const versions = fs.readdirSync('/Library/Frameworks/Xamarin.iOS.framework');
+        versions.forEach(w => console.log(w));
 
         invokeSelector('mono-version', MonoToolSelector);
         invokeSelector('xamarin-ios-version', XamarinIosToolSelector);

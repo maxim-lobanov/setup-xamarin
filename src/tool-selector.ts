@@ -15,7 +15,8 @@ export abstract class ToolSelector {
 
     public getAllVersions(): string[] {
         const potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
-        return potentialVersions.filter(child => compareVersions.validate(child));
+        const versions = potentialVersions.filter(child => compareVersions.validate(child));
+        return versions.sort(compareVersions);
     }
 
     public setVersion(version: string): void {
