@@ -136,7 +136,7 @@ class ToolSelector {
         if (fs.existsSync(currentVersionDirectory)) {
             //fs.unlinkSync(currentVersionDirectory);
             const res = child.execSync(`sudo rm -f ${currentVersionDirectory}`);
-            console.log(res);
+            console.log(res.toString());
         }
         fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
     }
