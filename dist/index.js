@@ -400,13 +400,13 @@ function run() {
                 throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
             }
             console.log('Mono:');
-            (new mono_selector_1.MonoToolSelector()).getAllVersions();
+            (new mono_selector_1.MonoToolSelector()).getAllVersions().forEach(w => console.log(w));
             console.log('Xamarin.iOS:');
-            (new xamarin_ios_selector_1.XamarinIosToolSelector()).getAllVersions();
+            (new xamarin_ios_selector_1.XamarinIosToolSelector()).getAllVersions().forEach(w => console.log(w));
             console.log('Xamarin.Mac:');
-            (new xamarin_mac_selector_1.XamarinMacToolSelector()).getAllVersions();
+            (new xamarin_mac_selector_1.XamarinMacToolSelector()).getAllVersions().forEach(w => console.log(w));
             console.log('Xamarin.Android:');
-            (new xamarin_android_selector_1.XamarinAndroidToolSelector()).getAllVersions();
+            (new xamarin_android_selector_1.XamarinAndroidToolSelector()).getAllVersions().forEach(w => console.log(w));
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);

@@ -48,13 +48,13 @@ async function run() {
         }
 
         console.log('Mono:');
-        (new MonoToolSelector()).getAllVersions();
+        (new MonoToolSelector()).getAllVersions().forEach(w => console.log(w));
         console.log('Xamarin.iOS:');
-        (new XamarinIosToolSelector()).getAllVersions();
+        (new XamarinIosToolSelector()).getAllVersions().forEach(w => console.log(w));
         console.log('Xamarin.Mac:');
-        (new XamarinMacToolSelector()).getAllVersions();
+        (new XamarinMacToolSelector()).getAllVersions().forEach(w => console.log(w));
         console.log('Xamarin.Android:');
-        (new XamarinAndroidToolSelector()).getAllVersions();
+        (new XamarinAndroidToolSelector()).getAllVersions().forEach(w => console.log(w));
         
 
         invokeSelector('mono-version', MonoToolSelector);
