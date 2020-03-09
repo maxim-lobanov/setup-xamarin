@@ -45,10 +45,11 @@ export abstract class ToolSelector {
         }
 
         const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
-        core.debug(`Creating symlink '${targetVersionDirectory}' -> '${currentVersionDirectory}'`);
+        core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
             //fs.unlinkSync(currentVersionDirectory);
-            child.execSync(`sudo rm -f ${currentVersionDirectory}`)
+            const res = child.execSync(`sudo rm -f ${currentVersionDirectory}`);
+            console.log(res);
         }
 
         fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
