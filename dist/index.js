@@ -129,7 +129,7 @@ class ToolSelector {
             const res = child.spawnSync('/usr/bin/sudo', ['rm', '-f', currentVersionDirectory]);
             fs.readdirSync(this.versionsDirectoryPath).forEach(w => console.log(w.toString()));
         }
-        fs.symlinkSync(targetVersionDirectory, currentVersionDirectory);
+        fs.symlinkSync(targetVersionDirectory, currentVersionDirectory, 'dir');
     }
 }
 exports.ToolSelector = ToolSelector;
