@@ -126,7 +126,7 @@ class ToolSelector {
         core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
             //fs.unlinkSync(currentVersionDirectory);
-            const res = child.spawnSync('sudo', [`rm`, `-f`, `${currentVersionDirectory}`]);
+            const res = child.spawnSync('/usr/bin/sudo', [`rm -f ${currentVersionDirectory}`]);
             console.log(res.status);
             console.log(res.stdout.toString());
             console.log(res.stderr.toString());
