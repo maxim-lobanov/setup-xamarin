@@ -196,6 +196,7 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
             return fs.readFileSync(versionFile).toString();
         });
+        potentialVersions.forEach(w => console.log(w));
         potentialVersions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
