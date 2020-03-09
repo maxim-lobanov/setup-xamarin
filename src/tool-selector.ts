@@ -33,7 +33,7 @@ export abstract class ToolSelector {
         }
 
         const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
-        core.debug(`Creating symlink '${targetVersionDirectory}' -> '${currentVersionDirectory}'`)
+        core.debug(`Creating symlink '${targetVersionDirectory}' -> '${currentVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
             fs.unlinkSync(currentVersionDirectory);
         }
