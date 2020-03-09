@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as child from 'child_process';
 import * as core from '@actions/core';
+import * as exec from '@actions/exec';
 import compareVersions from 'compare-versions';
 import { normalizeVersion } from './version-matcher';
 
@@ -45,7 +47,8 @@ export abstract class ToolSelector {
         const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
         core.debug(`Creating symlink '${targetVersionDirectory}' -> '${currentVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
-            fs.unlinkSync(currentVersionDirectory);
+            //fs.unlinkSync(currentVersionDirectory);
+            child.execSync(`sudo rm -f ${currentVersionDirectory}`)
         }
 
         fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);

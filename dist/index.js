@@ -73,6 +73,13 @@ exports.XamarinMacToolSelector = XamarinMacToolSelector;
 
 /***/ }),
 
+/***/ 129:
+/***/ (function(module) {
+
+module.exports = require("child_process");
+
+/***/ }),
+
 /***/ 136:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -91,6 +98,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
+const child = __importStar(__webpack_require__(129));
 const core = __importStar(__webpack_require__(470));
 const compare_versions_1 = __importDefault(__webpack_require__(247));
 const version_matcher_1 = __webpack_require__(846);
@@ -126,7 +134,8 @@ class ToolSelector {
         const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
         core.debug(`Creating symlink '${targetVersionDirectory}' -> '${currentVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
-            fs.unlinkSync(currentVersionDirectory);
+            //fs.unlinkSync(currentVersionDirectory);
+            child.execSync(`sudo rm -f ${currentVersionDirectory}`);
         }
         fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
     }
