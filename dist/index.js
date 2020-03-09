@@ -170,19 +170,37 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const tool_selector_1 = __webpack_require__(136);
+const compare_versions_1 = __importDefault(__webpack_require__(247));
+const version_matcher_1 = __webpack_require__(846);
 class MonoToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
         return 'Mono';
     }
     get versionLength() {
-        return 3;
+        return 4;
     }
     get basePath() {
         return '/Library/Frameworks/Mono.framework';
+    }
+    getAllVersions() {
+        let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
+        potentialVersions = potentialVersions.map(version => {
+            const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
+            return fs.readFileSync(versionFile).toString();
+        });
+        potentialVersions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
+        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
+        // filter such symlinks and look for only real versions
+        potentialVersions = potentialVersions.filter(child => version_matcher_1.normalizeVersion(child, this.versionLength) === child);
+        return potentialVersions.sort(compare_versions_1.default);
     }
     setVersion(version) {
         super.setVersion(version);
@@ -388,7 +406,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (process.platform !== 'darwin') {
-                throw new Error(`This task is intended only for macOS system. It can't be run on '${process.platform}' platform`);
+                throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
             }
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);

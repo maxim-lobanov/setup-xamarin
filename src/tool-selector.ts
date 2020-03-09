@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as child from 'child_process';
 import * as core from '@actions/core';
 import compareVersions from 'compare-versions';
 import { normalizeVersion } from './version-matcher';

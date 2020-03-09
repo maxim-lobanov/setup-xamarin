@@ -1,6 +1,9 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import * as core from '@actions/core';
 import { ToolSelector } from './tool-selector';
+import compareVersions from 'compare-versions';
+import { normalizeVersion } from './version-matcher';
 
 export class MonoToolSelector extends ToolSelector {
     public get toolName(): string {
@@ -8,11 +11,25 @@ export class MonoToolSelector extends ToolSelector {
     }
 
     public get versionLength(): number {
-        return 3;
+        return 4;
     }
 
     protected get basePath(): string {
         return '/Library/Frameworks/Mono.framework';
+    }
+
+    public getAllVersions(): string[] {
+        let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
+        potentialVersions = potentialVersions.map(version => {
+            const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
+            return fs.readFileSync(versionFile).toString();
+        });
+        potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
+        
+        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
+        // filter such symlinks and look for only real versions
+        potentialVersions = potentialVersions.filter(child => normalizeVersion(child, this.versionLength) === child);
+        return potentialVersions.sort(compareVersions);
     }
 
     public setVersion(version: string): void {
