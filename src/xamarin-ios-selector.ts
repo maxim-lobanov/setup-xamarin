@@ -5,10 +5,6 @@ export class XamarinIosToolSelector extends ToolSelector {
         return 'Xamarin.iOS';
     }
 
-    public get versionLength(): number {
-        return 4;
-    }
-
     protected get basePath(): string {
         return '/Library/Frameworks/Xamarin.iOS.framework';
     }

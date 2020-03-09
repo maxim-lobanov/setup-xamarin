@@ -18,7 +18,7 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
     const selector = new selectorClass();
     core.info(`Switching ${selector.toolName} to version ${versionSpec}...`);
 
-    const normalizedVersionSpec = normalizeVersion(versionSpec, selector.versionLength);
+    const normalizedVersionSpec = normalizeVersion(versionSpec);
     if (!normalizedVersionSpec) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
@@ -26,7 +26,7 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
 
     const availableVersions = selector.getAllVersions();
 
-    const targetVersion = matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
+    const targetVersion = matchVersion(availableVersions, normalizedVersionSpec);
     if (!targetVersion) {
         throw new Error([
             `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`,
@@ -46,6 +46,16 @@ async function run() {
         if (process.platform !== 'darwin') {
             throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
         }
+
+        console.log('Mono:');
+        (new MonoToolSelector()).getAllVersions();
+        console.log('Xamarin.iOS:');
+        (new XamarinIosToolSelector()).getAllVersions();
+        console.log('Xamarin.Mac:');
+        (new XamarinMacToolSelector()).getAllVersions();
+        console.log('Xamarin.Android:');
+        (new XamarinAndroidToolSelector()).getAllVersions();
+        
 
         invokeSelector('mono-version', MonoToolSelector);
         invokeSelector('xamarin-ios-version', XamarinIosToolSelector);

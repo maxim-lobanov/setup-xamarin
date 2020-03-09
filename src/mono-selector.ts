@@ -3,55 +3,35 @@ import * as path from 'path';
 import * as core from '@actions/core';
 import { ToolSelector } from './tool-selector';
 import compareVersions from 'compare-versions';
-import { normalizeVersion } from './version-matcher';
+import { normalizeVersion, cutVersion } from './version-matcher';
 
 export class MonoToolSelector extends ToolSelector {
-    public get toolName(): string {
-        return 'Mono';
-    }
-
-    public get versionLength(): number {
-        return 4;
-    }
+    protected readonly versionFormatLength = 3; // version folder contains 3 digits, like '/Versions/6.6.0'
 
     protected get basePath(): string {
         return '/Library/Frameworks/Mono.framework';
     }
 
+    public get toolName(): string {
+        return 'Mono';
+    }
+
     public getAllVersions(): string[] {
-        let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
-        console.log('debug 1');
-        potentialVersions.forEach(w => console.log(w));
+        const versionsFolders = super.getAllVersions();
 
-        potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
-        console.log('debug 2');
-        potentialVersions.forEach(w => console.log(w));
-
-        potentialVersions = potentialVersions.filter(child => normalizeVersion(child, 3) === child);
-        console.log('debug 3');
-        potentialVersions.forEach(w => console.log(w));
-
-        potentialVersions = potentialVersions.map(version => {
+        return versionsFolders.map(version => {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
-            console.log(versionFile);
             const realVersion = fs.readFileSync(versionFile).toString();
-            console.log(realVersion);
             return realVersion.trim();
         });
-
-        console.log('debug 4');
-        potentialVersions.forEach(w => console.log(w));
-
-        return potentialVersions.sort(compareVersions);
     }
 
     public setVersion(version: string): void {
-        version = version.split('.').slice(0,3).join('.');
+        version = cutVersion(version, this.versionFormatLength);
         super.setVersion(version);
 
         const versionDirectory = this.getVersionPath(version);
 
-        core.debug('Update DYLD_LIBRARY_FALLBACK_PATH environment variable');
         core.exportVariable(
             'DYLD_LIBRARY_FALLBACK_PATH',
             [
@@ -62,7 +42,6 @@ export class MonoToolSelector extends ToolSelector {
             ].join(path.delimiter)
         );
 
-        core.debug('Update PKG_CONFIG_PATH environment variable');
         core.exportVariable(
             'PKG_CONFIG_PATH',
             [

@@ -6,8 +6,8 @@ import { normalizeVersion } from './version-matcher';
 import { invokeCommandSync } from './utils';
 
 export abstract class ToolSelector {
-    public abstract get toolName(): string;
-    public abstract get versionLength(): number;
+    protected readonly versionFormatLength: number = 4; // version folder contains 4 digits, like '/Versions/13.2.1.4'
+
     protected abstract get basePath(): string;
 
     protected get versionsDirectoryPath(): string {
@@ -18,13 +18,19 @@ export abstract class ToolSelector {
         return path.join(this.versionsDirectoryPath, version);
     }
 
+    public abstract get toolName(): string;
+
     public getAllVersions(): string[] {
-        let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
+        const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: 'utf8', withFileTypes: true });
+
+        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
+        // filter such symlinks and look for only real versions
+        let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory).map(child => child.name);
         potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
 
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
-        potentialVersions = potentialVersions.filter(child => normalizeVersion(child, this.versionLength) === child);
+        // potentialVersions = potentialVersions.filter(child => normalizeVersion(child, this.versionFormatLength) === child);
         return potentialVersions.sort(compareVersions);
     }
 
