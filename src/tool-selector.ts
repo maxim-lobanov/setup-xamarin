@@ -18,11 +18,20 @@ export abstract class ToolSelector {
 
     public getAllVersions(): string[] {
         let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
+        console.log('---------------------');
+        console.log('potential versions 1:');
+        potentialVersions.forEach(w => console.log(w));
         potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
+        console.log('---------------------');
+        console.log('potential versions 1:');
+        potentialVersions.forEach(w => console.log(w));
 
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
         potentialVersions = potentialVersions.filter(child => normalizeVersion(child) === child);
+        console.log('---------------------');
+        console.log('potential versions 1:');
+        potentialVersions.forEach(w => console.log(w));
         return potentialVersions.sort(compareVersions);
     }
 
