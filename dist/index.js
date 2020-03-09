@@ -357,6 +357,7 @@ const xamarin_ios_selector_1 = __webpack_require__(497);
 const xamarin_mac_selector_1 = __webpack_require__(116);
 const xamarin_android_selector_1 = __webpack_require__(182);
 const version_matcher_1 = __webpack_require__(846);
+const os_1 = __webpack_require__(87);
 const invokeSelector = (variableName, selectorClass) => {
     const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
@@ -372,12 +373,14 @@ const invokeSelector = (variableName, selectorClass) => {
     const availableVersions = selector.getAllVersions();
     const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
     if (!targetVersion) {
-        core.info('Available versions:');
-        availableVersions.forEach(ver => core.info(`- ${ver}`));
-        throw new Error(`Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`);
+        throw new Error([
+            `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`,
+            'Available versions:',
+            ...availableVersions.map(ver => `- ${ver}`)
+        ].join(os_1.EOL));
     }
     selector.setVersion(targetVersion);
-    core.info('Switched');
+    core.info(`Switched to ${targetVersion}`);
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {

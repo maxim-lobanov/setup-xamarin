@@ -17,7 +17,6 @@ jobs:
 
     - name: Validate Mono
       run: |
-        [[ $(which mono) = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono" ]] || exit 1
         mono --version | grep "Mono JIT compiler version 6.7"
 
   setup-xamarin-full-version:
@@ -28,7 +27,7 @@ jobs:
       id: test
       uses: maxim-lobanov/setup-xamarin@implement-first-version
       with:
-        mono-version: 6.6.0.166
+        mono-version: 6.6.0
         xamarin-ios-version: 13.10.0.21
         xamarin-mac-version: 6.6.0.12
         xamarin-android-version: 10.1.3.7

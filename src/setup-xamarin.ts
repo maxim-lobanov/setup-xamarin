@@ -5,6 +5,7 @@ import { XamarinMacToolSelector } from './xamarin-mac-selector';
 import { XamarinAndroidToolSelector } from './xamarin-android-selector';
 import { ToolSelector } from './tool-selector';
 import { matchVersion, normalizeVersion } from './version-matcher';
+import { EOL } from 'os';
 
 const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelector }): void => {
     const versionSpec = core.getInput(variableName, { required: false });
@@ -25,13 +26,15 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
 
     const targetVersion = matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
     if (!targetVersion) {
-        core.info('Available versions:');
-        availableVersions.forEach(ver => core.info(`- ${ver}`));
-        throw new Error(`Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`);
+        throw new Error([
+            `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`,
+            'Available versions:',
+            ...availableVersions.map(ver => `- ${ver}`)
+        ].join(EOL));
     }
 
     selector.setVersion(targetVersion);
-    core.info('Switched');
+    core.info(`Switched to ${targetVersion}`);
 };
 
 async function run() {
