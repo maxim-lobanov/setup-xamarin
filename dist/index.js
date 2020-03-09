@@ -131,7 +131,7 @@ class ToolSelector {
             console.log(res.stdout.toString());
             console.log(res.stderr.toString());
             res.output.forEach(w => console.log(w));
-            fs.readdirSync(this.versionsDirectoryPath).forEach(w => console.log(w));
+            fs.readdirSync(this.versionsDirectoryPath).forEach(w => console.log(w.toString()));
         }
         fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
     }
