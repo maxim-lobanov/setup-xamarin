@@ -1,4 +1,4 @@
-name: Validate setup-xamarin task
+name: Validate 'setup-xamarin' task (all test cases)
 on: [push]
 
 jobs:
@@ -7,7 +7,6 @@ jobs:
     name: valid versions (should pass)
     steps:
     - name: setup-xamarin
-      id: test
       uses: maxim-lobanov/setup-xamarin@implement-first-version
       with:
         mono-version: 6.6
@@ -15,22 +14,23 @@ jobs:
         xamarin-mac-version: 6.6
         xamarin-android-version: 10.1
 
-    - name: Validate Mono
-      run: |
-        mono --version | grep "Mono JIT compiler version 6.7"
+    - name: Validate versions
+      run: .github/workflows/validate-versions.sh '6.6' '13.8' '6.6' '10.1'
 
   setup-xamarin-full-version:
     runs-on: macos-latest
     name: valid full versions (should warn)
     steps:
     - name: setup-xamarin
-      id: test
       uses: maxim-lobanov/setup-xamarin@implement-first-version
       with:
         mono-version: 6.6.0
         xamarin-ios-version: 13.10.0.21
         xamarin-mac-version: 6.6.0.12
         xamarin-android-version: 10.1.3.7
+
+    - name: Validate versions
+      run: .github/workflows/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3.7'
 
   setup-xamarin-invalid-version:
     runs-on: macos-latest

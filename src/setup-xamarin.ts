@@ -34,7 +34,7 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
     }
 
     selector.setVersion(targetVersion);
-    core.info(`Switched to ${targetVersion}`);
+    core.info(`${selector.toolName} is set to ${targetVersion}`);
 };
 
 async function run() {

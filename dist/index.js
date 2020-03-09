@@ -380,7 +380,7 @@ const invokeSelector = (variableName, selectorClass) => {
         ].join(os_1.EOL));
     }
     selector.setVersion(targetVersion);
-    core.info(`Switched to ${targetVersion}`);
+    core.info(`${selector.toolName} is set to ${targetVersion}`);
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
