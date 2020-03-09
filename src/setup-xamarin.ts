@@ -15,7 +15,7 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
     const selector = new selectorClass();
     core.info(`Switch ${selector.toolName} to version ${versionSpec}`);
 
-    const normalizedVersionSpec = normalizeVersion(versionSpec);
+    const normalizedVersionSpec = normalizeVersion(versionSpec, selector.versionLength);
     if (!normalizedVersionSpec) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
@@ -23,7 +23,7 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
 
     const availableVersions = selector.getAllVersions();
 
-    const targetVersion = matchVersion(availableVersions, normalizedVersionSpec);
+    const targetVersion = matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
     if (!targetVersion) {
         core.info('Available versions:');
         availableVersions.forEach(ver => core.info(`- ${ver}`));

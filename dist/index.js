@@ -61,6 +61,9 @@ class XamarinMacToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
         return 'Xamarin.Mac';
     }
+    get versionLength() {
+        return 4;
+    }
     get basePath() {
         return '/Library/Frameworks/Xamarin.Mac.framework';
     }
@@ -109,7 +112,7 @@ class ToolSelector {
         potentialVersions.forEach(w => console.log(w));
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
-        potentialVersions = potentialVersions.filter(child => version_matcher_1.normalizeVersion(child) === child);
+        potentialVersions = potentialVersions.filter(child => version_matcher_1.normalizeVersion(child, this.versionLength) === child);
         console.log('---------------------');
         console.log('potential versions 1:');
         potentialVersions.forEach(w => console.log(w));
@@ -144,6 +147,9 @@ class XamarinAndroidToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
         return 'Xamarin.Android';
     }
+    get versionLength() {
+        return 4;
+    }
     get basePath() {
         return '/Library/Frameworks/Xamarin.Android.framework';
     }
@@ -172,6 +178,9 @@ const tool_selector_1 = __webpack_require__(136);
 class MonoToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
         return 'Mono';
+    }
+    get versionLength() {
+        return 3;
     }
     get basePath() {
         return '/Library/Frameworks/Mono.framework';
@@ -356,13 +365,13 @@ const invokeSelector = (variableName, selectorClass) => {
     }
     const selector = new selectorClass();
     core.info(`Switch ${selector.toolName} to version ${versionSpec}`);
-    const normalizedVersionSpec = version_matcher_1.normalizeVersion(versionSpec);
+    const normalizedVersionSpec = version_matcher_1.normalizeVersion(versionSpec, selector.versionLength);
     if (!normalizedVersionSpec) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
     core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
     const availableVersions = selector.getAllVersions();
-    const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec);
+    const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
     if (!targetVersion) {
         core.info('Available versions:');
         availableVersions.forEach(ver => core.info(`- ${ver}`));
@@ -704,6 +713,9 @@ class XamarinIosToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
         return 'Xamarin.iOS';
     }
+    get versionLength() {
+        return 4;
+    }
     get basePath() {
         return '/Library/Frameworks/Xamarin.iOS.framework';
     }
@@ -737,25 +749,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const compare_versions_1 = __importDefault(__webpack_require__(247));
-exports.normalizeVersion = (version) => {
+exports.normalizeVersion = (version, versionLength) => {
     if (!compare_versions_1.default.validate(version)) {
         return null;
     }
     const parts = version.split('.');
-    while (parts.length < 4) {
+    while (parts.length < versionLength) {
         parts.push('x');
     }
     return parts.join('.');
 };
 exports.countVersionDigits = (version) => {
-    if (exports.normalizeVersion(version) === null) {
+    if (!compare_versions_1.default.validate(version)) {
         return 0;
     }
     const parts = version.split('.');
     return parts.length;
 };
-exports.matchVersion = (availableVersions, versionSpec) => {
-    const normalizedVersionSpec = exports.normalizeVersion(versionSpec);
+exports.matchVersion = (availableVersions, versionSpec, versionLength) => {
+    const normalizedVersionSpec = exports.normalizeVersion(versionSpec, versionLength);
     if (!normalizedVersionSpec) {
         return null;
     }

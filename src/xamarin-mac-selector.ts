@@ -5,6 +5,10 @@ export class XamarinMacToolSelector extends ToolSelector {
         return 'Xamarin.Mac';
     }
 
+    public get versionLength(): number {
+        return 4;
+    }
+
     protected get basePath(): string {
         return '/Library/Frameworks/Xamarin.Mac.framework';
     }

@@ -1,19 +1,19 @@
 import compareVersions from 'compare-versions';
 
-export const normalizeVersion = (version: string): string | null => {
+export const normalizeVersion = (version: string, versionLength: number): string | null => {
     if (!compareVersions.validate(version)) {
         return null;
     }
 
     const parts = version.split('.');
-    while (parts.length < 4) {
+    while (parts.length < versionLength) {
         parts.push('x');
     }
     return parts.join('.');
 };
 
 export const countVersionDigits = (version: string): number => {
-    if (normalizeVersion(version) === null) {
+    if (!compareVersions.validate(version)) {
         return 0;
     }
 
@@ -21,8 +21,8 @@ export const countVersionDigits = (version: string): number => {
     return parts.length;
 };
 
-export const matchVersion = (availableVersions: string[], versionSpec: string): string | null => {
-    const normalizedVersionSpec = normalizeVersion(versionSpec);
+export const matchVersion = (availableVersions: string[], versionSpec: string, versionLength: number): string | null => {
+    const normalizedVersionSpec = normalizeVersion(versionSpec, versionLength);
     if (!normalizedVersionSpec) {
         return null;
     }

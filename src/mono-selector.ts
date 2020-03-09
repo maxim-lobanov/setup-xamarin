@@ -7,6 +7,10 @@ export class MonoToolSelector extends ToolSelector {
         return 'Mono';
     }
 
+    public get versionLength(): number {
+        return 3;
+    }
+
     protected get basePath(): string {
         return '/Library/Frameworks/Mono.framework';
     }

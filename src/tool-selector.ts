@@ -6,6 +6,7 @@ import { normalizeVersion } from './version-matcher';
 
 export abstract class ToolSelector {
     public abstract get toolName(): string;
+    public abstract get versionLength(): number;
     protected abstract get basePath(): string;
 
     protected get versionsDirectoryPath(): string {
@@ -28,7 +29,7 @@ export abstract class ToolSelector {
 
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
-        potentialVersions = potentialVersions.filter(child => normalizeVersion(child) === child);
+        potentialVersions = potentialVersions.filter(child => normalizeVersion(child, this.versionLength) === child);
         console.log('---------------------');
         console.log('potential versions 1:');
         potentialVersions.forEach(w => console.log(w));
