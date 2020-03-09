@@ -11,5 +11,5 @@ inputs:
   xamarin-android-version:
     description: 'Version of Xamarin.Android to select'
 runs:
-  using: 'node13'
+  using: 'node12'
   main: 'dist/index.js'
