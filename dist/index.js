@@ -370,6 +370,10 @@ const invokeSelector = (variableName, selectorClass) => {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
     core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
+    if (version_matcher_1.countVersionDigits(versionSpec) > 2) {
+        core.warning(`It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`);
+        core.warning(`Hosted VMs contain the latest patch & build version for each major & minor pair. It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`);
+    }
     const availableVersions = selector.getAllVersions();
     const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
     if (!targetVersion) {
