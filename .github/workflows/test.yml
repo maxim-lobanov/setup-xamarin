@@ -2,7 +2,7 @@ name: Validate 'setup-xamarin' task (all test cases)
 on: [push]
 
 jobs:
-  setup-xamarin:
+  valid-versions:
     runs-on: macos-latest
     name: valid versions (should pass)
     steps:
@@ -20,7 +20,7 @@ jobs:
     - name: Validate versions
       run: ./__tests__/validate-versions.sh '6.6' '13.8' '6.6' '10.1'
 
-  setup-xamarin-full-version:
+  full-versions:
     runs-on: macos-latest
     name: valid full versions (should warn)
     steps:
@@ -38,9 +38,22 @@ jobs:
     - name: Validate versions
       run: ./__tests__/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3'
 
-  setup-xamarin-invalid-version:
+  invalid-versions:
     runs-on: macos-latest
     name: invalid versions (should fail)
+    steps:
+    - name: setup-xamarin
+      id: test
+      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      with:
+        mono-version: 5.8
+        xamarin-ios-version: 13.8
+        xamarin-mac-version: 6.6
+        xamarin-android-version: 10.1
+
+  invalid-platform:
+    runs-on: ubuntu-latest
+    name: invalid platform (should fail)
     steps:
     - name: setup-xamarin
       id: test
