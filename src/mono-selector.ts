@@ -25,18 +25,24 @@ export class MonoToolSelector extends ToolSelector {
             console.log(versionFile);
             const realVersion = fs.readFileSync(versionFile).toString();
             console.log(realVersion);
-            return realVersion
+            return realVersion;
         });
+
+        console.log('debug');
+        potentialVersions.forEach(w => console.log(w));
 
         potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
         
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
         potentialVersions = potentialVersions.filter(child => normalizeVersion(child, this.versionLength) === child);
+        console.log('debug');
+        potentialVersions.forEach(w => console.log(w));
         return potentialVersions.sort(compareVersions);
     }
 
     public setVersion(version: string): void {
+        version = version.split('.').slice(0,3).join('.');
         super.setVersion(version);
 
         const versionDirectory = this.getVersionPath(version);
