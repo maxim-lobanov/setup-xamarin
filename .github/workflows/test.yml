@@ -39,7 +39,7 @@ jobs:
       run: pwd && ls
 
     - name: Validate versions
-      run: sh ./__tests__/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3.7'
+      run: ./__tests__/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3.7'
 
   setup-xamarin-invalid-version:
     runs-on: macos-latest
