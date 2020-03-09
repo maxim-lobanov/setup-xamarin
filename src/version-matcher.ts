@@ -10,6 +10,15 @@ export const normalizeVersion = (version: string): string | null => {
     return parts.join('.');
 };
 
+export const countVersionDigits = (version: string): number => {
+    if (normalizeVersion(version) === null) {
+        return 0;
+    }
+
+    const parts = version.split('.');
+    return parts.length;
+};
+
 export const matchVersion = (availableVersions: string[], versionSpec: string): string | null => {
     const normalizedVersionSpec = normalizeVersion(versionSpec);
     if (!normalizedVersionSpec) {

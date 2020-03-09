@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import compareVersions from 'compare-versions';
+import { normalizeVersion } from './version-matcher';
 
 export abstract class ToolSelector {
     protected abstract get basePath(): string;
@@ -14,9 +15,13 @@ export abstract class ToolSelector {
     }
 
     public getAllVersions(): string[] {
-        const potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
-        const versions = potentialVersions.filter(child => compareVersions.validate(child));
-        return versions.sort(compareVersions);
+        let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
+        potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
+
+        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
+        // filter such symlinks and look for only real versions
+        potentialVersions = potentialVersions.filter(child => normalizeVersion(child) === child);
+        return potentialVersions.sort(compareVersions);
     }
 
     public setVersion(version: string): void {

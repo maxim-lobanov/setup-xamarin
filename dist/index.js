@@ -86,6 +86,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const compare_versions_1 = __importDefault(__webpack_require__(247));
+const version_matcher_1 = __webpack_require__(846);
 class ToolSelector {
     get versionsDirectoryPath() {
         return path.join(this.basePath, 'Versions');
@@ -94,9 +95,12 @@ class ToolSelector {
         return path.join(this.versionsDirectoryPath, version);
     }
     getAllVersions() {
-        const potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
-        const versions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
-        return versions.sort(compare_versions_1.default);
+        let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
+        potentialVersions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
+        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
+        // filter such symlinks and look for only real versions
+        potentialVersions = potentialVersions.filter(child => version_matcher_1.normalizeVersion(child) === child);
+        return potentialVersions.sort(compare_versions_1.default);
     }
     setVersion(version) {
         const versionDirectory = this.getVersionPath(version);
@@ -311,7 +315,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const mono_selector_1 = __webpack_require__(220);
 const xamarin_ios_selector_1 = __webpack_require__(497);
@@ -341,8 +344,6 @@ function run() {
             if (process.platform !== 'darwin') {
                 throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
             }
-            const versions = fs.readdirSync('/Library/Frameworks/Xamarin.iOS.framework/Versions');
-            versions.forEach(w => console.log(w));
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
@@ -709,6 +710,13 @@ exports.normalizeVersion = (version) => {
         parts.push('x');
     }
     return parts.join('.');
+};
+exports.countVersionDigits = (version) => {
+    if (exports.normalizeVersion(version) === null) {
+        return 0;
+    }
+    const parts = version.split('.');
+    return parts.length;
 };
 exports.matchVersion = (availableVersions, versionSpec) => {
     const normalizedVersionSpec = exports.normalizeVersion(versionSpec);
