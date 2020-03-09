@@ -365,7 +365,7 @@ const invokeSelector = (variableName, selectorClass) => {
         return;
     }
     const selector = new selectorClass();
-    core.info(`Switch ${selector.toolName} to version ${versionSpec}`);
+    core.info(`Switching ${selector.toolName} to version ${versionSpec}...`);
     const normalizedVersionSpec = version_matcher_1.normalizeVersion(versionSpec, selector.versionLength);
     if (!normalizedVersionSpec) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
@@ -395,9 +395,11 @@ function run() {
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
             invokeSelector('xamarin-android-version', xamarin_android_selector_1.XamarinAndroidToolSelector);
             if (showVersionMajorMinorWarning) {
-                core.warning(`It is recommended to specify only major and minor versions of tool (like '13' or '13.2').
-Hosted VMs contain the latest patch & build version for each major & minor pair. It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.
-            `);
+                core.warning([
+                    `It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`,
+                    `Hosted VMs contain the latest patch & build version for each major & minor pair.`,
+                    `It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`
+                ].join(' '));
             }
         }
         catch (error) {
