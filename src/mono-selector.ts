@@ -22,9 +22,12 @@ export class MonoToolSelector extends ToolSelector {
         let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
         potentialVersions = potentialVersions.map(version => {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
-            return fs.readFileSync(versionFile).toString();
+            console.log(versionFile);
+            const realVersion = fs.readFileSync(versionFile).toString();
+            console.log(realVersion);
+            return realVersion
         });
-        potentialVersions.forEach(w => console.log(w));
+
         potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
         
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
