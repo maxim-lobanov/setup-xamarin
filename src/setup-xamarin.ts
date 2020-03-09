@@ -34,7 +34,7 @@ async function run() {
             throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
         }
 
-        const versions = fs.readdirSync('/Library/Frameworks/Xamarin.iOS.framework');
+        const versions = fs.readdirSync('/Library/Frameworks/Xamarin.iOS.framework/Versions');
         versions.forEach(w => console.log(w));
 
         invokeSelector('mono-version', MonoToolSelector);

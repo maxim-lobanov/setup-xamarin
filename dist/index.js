@@ -341,7 +341,7 @@ function run() {
             if (process.platform !== 'darwin') {
                 throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
             }
-            const versions = fs.readdirSync('/Library/Frameworks/Xamarin.iOS.framework');
+            const versions = fs.readdirSync('/Library/Frameworks/Xamarin.iOS.framework/Versions');
             versions.forEach(w => console.log(w));
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
