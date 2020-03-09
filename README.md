@@ -3,5 +3,6 @@ Set up your GitHub Actions workflow with a specific version of Mono &amp; Xamari
 
 
 # To-Do
-1. Add tests
-2. Improve error handling
+1. More test cases?
+2. Support `latest` keyword?
+3. Update docs

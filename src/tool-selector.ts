@@ -5,6 +5,8 @@ import compareVersions from 'compare-versions';
 import { invokeCommandSync } from './utils';
 
 export abstract class ToolSelector {
+    public abstract get toolName(): string;
+
     protected abstract get basePath(): string;
 
     protected get versionsDirectoryPath(): string {
@@ -14,8 +16,6 @@ export abstract class ToolSelector {
     protected getVersionPath(version: string): string {
         return path.join(this.versionsDirectoryPath, version);
     }
-
-    public abstract get toolName(): string;
 
     public getAllVersions(): string[] {
         const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: 'utf8', withFileTypes: true });

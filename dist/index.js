@@ -178,7 +178,7 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
     }
     getAllVersions() {
         const versionsFolders = super.getAllVersions();
-        // we need to look into '/Versions/<version_folder>/version' file for Mono to determine full version
+        // we have to look into '/Mono.Framework/Versions/<version_folder>/Version' file for Mono to determine full version
         return versionsFolders.map(version => {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
             const realVersion = fs.readFileSync(versionFile).toString();
@@ -391,16 +391,6 @@ function run() {
             if (process.platform !== 'darwin') {
                 throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
             }
-            /*
-            console.log('Mono:');
-            (new MonoToolSelector()).getAllVersions().forEach(w => console.log(w));
-            console.log('Xamarin.iOS:');
-            (new XamarinIosToolSelector()).getAllVersions().forEach(w => console.log(w));
-            console.log('Xamarin.Mac:');
-            (new XamarinMacToolSelector()).getAllVersions().forEach(w => console.log(w));
-            console.log('Xamarin.Android:');
-            (new XamarinAndroidToolSelector()).getAllVersions().forEach(w => console.log(w));
-            */
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);

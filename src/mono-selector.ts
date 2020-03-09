@@ -16,7 +16,7 @@ export class MonoToolSelector extends ToolSelector {
     public getAllVersions(): string[] {
         const versionsFolders = super.getAllVersions();
 
-        // we need to look into '/Versions/<version_folder>/version' file for Mono to determine full version
+        // we have to look into '/Mono.Framework/Versions/<version_folder>/Version' file for Mono to determine full version
         return versionsFolders.map(version => {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
             const realVersion = fs.readFileSync(versionFile).toString();
