@@ -821,7 +821,7 @@ exports.matchVersion = (availableVersions, versionSpec) => {
     if (!normalizedVersionSpec) {
         return null;
     }
-    const sortedVersions = [...availableVersions].sort(compare_versions_1.default).reverse();
+    const sortedVersions = availableVersions.sort(compare_versions_1.default).reverse();
     const version = sortedVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='));
     if (version) {
         return version;
