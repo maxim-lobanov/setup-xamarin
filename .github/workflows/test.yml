@@ -15,7 +15,7 @@ jobs:
         xamarin-android-version: 10.1
 
     - name: Validate versions
-      run: .github/workflows/validate-versions.sh '6.6' '13.8' '6.6' '10.1'
+      run: __tests__/validate-versions.sh '6.6' '13.8' '6.6' '10.1'
 
   setup-xamarin-full-version:
     runs-on: macos-latest
@@ -30,7 +30,7 @@ jobs:
         xamarin-android-version: 10.1.3.7
 
     - name: Validate versions
-      run: .github/workflows/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3.7'
+      run: __tests__/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3.7'
 
   setup-xamarin-invalid-version:
     runs-on: macos-latest
