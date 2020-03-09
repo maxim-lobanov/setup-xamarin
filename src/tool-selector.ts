@@ -40,8 +40,8 @@ export abstract class ToolSelector {
             //fs.unlinkSync(currentVersionDirectory);
             const res = child.spawnSync('sudo', [`rm -f ${currentVersionDirectory}`]);
             console.log(res.status);
-            console.log(res.stdout);
-            console.log(res.stderr);
+            console.log(res.stdout.toString());
+            console.log(res.stderr.toString());
         }
 
         fs.symlinkSync(currentVersionDirectory, targetVersionDirectory);
