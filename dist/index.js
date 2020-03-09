@@ -358,6 +358,7 @@ const xamarin_mac_selector_1 = __webpack_require__(116);
 const xamarin_android_selector_1 = __webpack_require__(182);
 const version_matcher_1 = __webpack_require__(846);
 const os_1 = __webpack_require__(87);
+let showVersionMajorMinorWarning = false;
 const invokeSelector = (variableName, selectorClass) => {
     const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
@@ -370,10 +371,6 @@ const invokeSelector = (variableName, selectorClass) => {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
     core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
-    if (version_matcher_1.countVersionDigits(versionSpec) > 2) {
-        core.warning(`It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`);
-        core.warning(`Hosted VMs contain the latest patch & build version for each major & minor pair. It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`);
-    }
     const availableVersions = selector.getAllVersions();
     const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
     if (!targetVersion) {
@@ -385,6 +382,7 @@ const invokeSelector = (variableName, selectorClass) => {
     }
     selector.setVersion(targetVersion);
     core.info(`${selector.toolName} is set to ${targetVersion}`);
+    showVersionMajorMinorWarning = showVersionMajorMinorWarning || version_matcher_1.countVersionDigits(versionSpec) > 2;
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -396,6 +394,10 @@ function run() {
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
             invokeSelector('xamarin-android-version', xamarin_android_selector_1.XamarinAndroidToolSelector);
+            if (showVersionMajorMinorWarning) {
+                core.warning(`It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`);
+                core.warning(`Hosted VMs contain the latest patch & build version for each major & minor pair. It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
