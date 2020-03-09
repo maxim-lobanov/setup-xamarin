@@ -25,7 +25,7 @@ const buildFsDirentItem = (name: string, isSymbolicLink: boolean, isDirectory: b
         isSymbolicLink: () => isSymbolicLink,
         isDirectory: () => isDirectory
     };
-}
+};
 
 selectors.forEach(selector => {
     describe(selector.name, () => {

@@ -10,10 +10,12 @@ export const invokeCommandSync = (command: string, args: string[], sudo: boolean
     }
 
     if (execResult.status !== 0) {
-        throw new Error([
-            `Error during run ${sudo ? 'sudo' : ''} ${command} ${args.join(' ')}`,
-            execResult.stderr,
-            execResult.stdout
-        ].join(EOL));
+        throw new Error(
+            [
+                `Error during run ${sudo ? 'sudo ' : ''}${command} ${args.join(' ')}`, //
+                execResult.stderr,
+                execResult.stdout
+            ].join(EOL)
+        );
     }
 };
