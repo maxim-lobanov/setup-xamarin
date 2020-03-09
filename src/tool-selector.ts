@@ -4,6 +4,7 @@ import * as child from 'child_process';
 import * as core from '@actions/core';
 import compareVersions from 'compare-versions';
 import { normalizeVersion } from './version-matcher';
+import { invokeCommandSync } from './utils';
 
 export abstract class ToolSelector {
     public abstract get toolName(): string;
@@ -37,14 +38,9 @@ export abstract class ToolSelector {
         const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
         core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
-            //fs.unlinkSync(currentVersionDirectory);
-            const res = child.spawnSync('/usr/bin/sudo', ['rm', '-f', currentVersionDirectory]);
-
-            fs.readdirSync(this.versionsDirectoryPath).forEach(w => console.log(w.toString()));
+            invokeCommandSync('rm', ['-f', currentVersionDirectory], true);
         }
 
-        console.log('sudo ln');
-        child.spawnSync('/usr/bin/sudo', ['ln', '-s', targetVersionDirectory, currentVersionDirectory]);
-        //fs.symlinkSync(targetVersionDirectory, currentVersionDirectory, 'dir');
+        invokeCommandSync('ln', ['-s', targetVersionDirectory, currentVersionDirectory], true);
     }
 }

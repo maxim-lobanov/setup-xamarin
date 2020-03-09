@@ -5,6 +5,7 @@ import { XamarinIosToolSelector } from '../src/xamarin-ios-selector';
 import { XamarinMacToolSelector } from '../src/xamarin-mac-selector';
 import { XamarinAndroidToolSelector } from '../src/xamarin-android-selector';
 import { ToolSelector } from '../src/tool-selector';
+import * as utils from '../src/utils';
 
 const selectors: { new (): ToolSelector }[] = [
     MonoToolSelector, //
@@ -15,6 +16,7 @@ const selectors: { new (): ToolSelector }[] = [
 
 jest.mock('fs');
 jest.mock('@actions/core');
+jest.mock('../src/utils');
 
 selectors.forEach(selector => {
     describe(selector.name, () => {
@@ -60,13 +62,11 @@ selectors.forEach(selector => {
 
         describe('setVersion', () => {
             let fsExistsSpy: jest.SpyInstance;
-            let fsSymlinkSpy: jest.SpyInstance;
-            let fsUnlinkSpy: jest.SpyInstance;
+            let fsInvokeCommandSpy: jest.SpyInstance;
 
             beforeEach(() => {
                 fsExistsSpy = jest.spyOn(fs, 'existsSync');
-                fsSymlinkSpy = jest.spyOn(fs, 'symlinkSync');
-                fsUnlinkSpy = jest.spyOn(fs, 'unlinkSync');
+                fsInvokeCommandSpy = jest.spyOn(utils, 'invokeCommandSync');
             });
 
             afterEach(() => {
@@ -80,24 +80,24 @@ selectors.forEach(selector => {
                 });
                 const sel = new selector();
                 sel.setVersion('1.2.3.4');
-                expect(fsSymlinkSpy).toHaveBeenCalled();
-                expect(fsUnlinkSpy).not.toHaveBeenCalled();
+                expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(1);
+                expect(fsInvokeCommandSpy).toHaveBeenCalledWith('ln', expect.any(Array), true);
             });
 
             it('symlink is recreated', () => {
                 fsExistsSpy.mockImplementation(() => true);
                 const sel = new selector();
                 sel.setVersion('1.2.3.4');
-                expect(fsUnlinkSpy).toHaveBeenCalled();
-                expect(fsSymlinkSpy).toHaveBeenCalled();
+                expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(2);
+                expect(fsInvokeCommandSpy).toHaveBeenCalledWith('rm', expect.any(Array), true);
+                expect(fsInvokeCommandSpy).toHaveBeenCalledWith('ln', expect.any(Array), true);
             });
 
             it(`error is thrown if version doesn't exist`, () => {
                 fsExistsSpy.mockImplementation(() => false);
                 const sel = new selector();
                 expect(() => sel.setVersion('1.2.3.4')).toThrow();
-                expect(fsSymlinkSpy).not.toHaveBeenCalled();
-                expect(fsUnlinkSpy).not.toHaveBeenCalled();
+                expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(0);
             });
         });
     });

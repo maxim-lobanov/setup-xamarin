@@ -1,15 +1,47 @@
+name: Validate setup-xamarin task
 on: [push]
 
 jobs:
   setup-xamarin:
     runs-on: macos-latest
-    name: Validate setup-xamarin task
+    name: valid versions (should pass)
     steps:
     - name: setup-xamarin
       id: test
       uses: maxim-lobanov/setup-xamarin@implement-first-version
       with:
         mono-version: 6.6
+        xamarin-ios-version: 13.8
+        xamarin-mac-version: 6.6
+        xamarin-android-version: 10.1
+
+    - name: Validate Mono
+      run: |
+        [[ $(which mono) = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono" ]] || exit 1
+        mono --version | grep "Mono JIT compiler version 6.7"
+
+  setup-xamarin-full-version:
+    runs-on: macos-latest
+    name: valid full versions (should warn)
+    steps:
+    - name: setup-xamarin
+      id: test
+      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      with:
+        mono-version: 6.6.0.166
+        xamarin-ios-version: 13.10.0.21
+        xamarin-mac-version: 6.6.0.12
+        xamarin-android-version: 10.1.3.7
+
+  setup-xamarin-invalid-version:
+    runs-on: macos-latest
+    name: invalid versions (should fail)
+    steps:
+    - name: setup-xamarin
+      id: test
+      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      with:
+        mono-version: 5.8
         xamarin-ios-version: 13.8
         xamarin-mac-version: 6.6
         xamarin-android-version: 10.1

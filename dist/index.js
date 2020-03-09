@@ -98,10 +98,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
-const child = __importStar(__webpack_require__(129));
 const core = __importStar(__webpack_require__(470));
 const compare_versions_1 = __importDefault(__webpack_require__(247));
 const version_matcher_1 = __webpack_require__(846);
+const utils_1 = __webpack_require__(611);
 class ToolSelector {
     get versionsDirectoryPath() {
         return path.join(this.basePath, 'Versions');
@@ -125,13 +125,9 @@ class ToolSelector {
         const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
         core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
-            //fs.unlinkSync(currentVersionDirectory);
-            const res = child.spawnSync('/usr/bin/sudo', ['rm', '-f', currentVersionDirectory]);
-            fs.readdirSync(this.versionsDirectoryPath).forEach(w => console.log(w.toString()));
+            utils_1.invokeCommandSync('rm', ['-f', currentVersionDirectory], true);
         }
-        console.log('sudo ln');
-        child.spawnSync('/usr/bin/sudo', ['ln', '-s', targetVersionDirectory, currentVersionDirectory]);
-        //fs.symlinkSync(targetVersionDirectory, currentVersionDirectory, 'dir');
+        utils_1.invokeCommandSync('ln', ['-s', targetVersionDirectory, currentVersionDirectory], true);
     }
 }
 exports.ToolSelector = ToolSelector;
@@ -724,6 +720,41 @@ class XamarinIosToolSelector extends tool_selector_1.ToolSelector {
     }
 }
 exports.XamarinIosToolSelector = XamarinIosToolSelector;
+
+
+/***/ }),
+
+/***/ 611:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const child = __importStar(__webpack_require__(129));
+const os_1 = __webpack_require__(87);
+exports.invokeCommandSync = (command, args, sudo) => {
+    let execResult;
+    if (sudo) {
+        execResult = child.spawnSync('sudo', [command, ...args]);
+    }
+    else {
+        execResult = child.spawnSync(command, args);
+    }
+    if (execResult.status !== 0) {
+        throw new Error([
+            `Error during run ${sudo ? 'sudo' : ''} ${command} ${args.join(' ')}`,
+            execResult.stderr,
+            execResult.stdout
+        ].join(os_1.EOL));
+    }
+};
 
 
 /***/ }),
