@@ -2,12 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as core from '@actions/core';
 import { ToolSelector } from './tool-selector';
-import compareVersions from 'compare-versions';
-import { normalizeVersion, cutVersion } from './version-matcher';
+import { cutVersionLength } from './version-matcher';
 
 export class MonoToolSelector extends ToolSelector {
-    protected readonly versionFormatLength = 3; // version folder contains 3 digits, like '/Versions/6.6.0'
-
     protected get basePath(): string {
         return '/Library/Frameworks/Mono.framework';
     }
@@ -19,6 +16,7 @@ export class MonoToolSelector extends ToolSelector {
     public getAllVersions(): string[] {
         const versionsFolders = super.getAllVersions();
 
+        // we need to look into '/Versions/<version_folder>/version' file for Mono to determine full version
         return versionsFolders.map(version => {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
             const realVersion = fs.readFileSync(versionFile).toString();
@@ -27,7 +25,9 @@ export class MonoToolSelector extends ToolSelector {
     }
 
     public setVersion(version: string): void {
-        version = cutVersion(version, this.versionFormatLength);
+        // for Mono, version folder contains only 3 digits instead of full version
+        version = cutVersionLength(version, 3);
+
         super.setVersion(version);
 
         const versionDirectory = this.getVersionPath(version);

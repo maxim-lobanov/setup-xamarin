@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as core from '@actions/core';
 import { MonoToolSelector } from '../src/mono-selector';
 import { XamarinIosToolSelector } from '../src/xamarin-ios-selector';
@@ -18,29 +19,37 @@ jest.mock('fs');
 jest.mock('@actions/core');
 jest.mock('../src/utils');
 
+const buildFsDirentItem = (name: string, isSymbolicLink: boolean, isDirectory: boolean) => {
+    return {
+        name,
+        isSymbolicLink: () => isSymbolicLink,
+        isDirectory: () => isDirectory
+    };
+}
+
 selectors.forEach(selector => {
     describe(selector.name, () => {
         describe('getAllVersions', () => {
             let fsReadDirSpy: jest.SpyInstance;
+            let fsReadFileSpy: jest.SpyInstance;
 
             beforeEach(() => {
                 fsReadDirSpy = jest.spyOn(fs, 'readdirSync');
                 fsReadDirSpy.mockImplementation(() => [
-                    '13.10',
-                    '13.10.0.21',
-                    '13.4',
-                    '13.4.0.2',
-                    '13.6',
-                    '13.6.0.12',
-                    '13.8',
-                    '13.8.3.0',
-                    '6_4_0',
-                    '6_4_1',
-                    '6_6_0',
-                    'third_party_folder',
-                    'Current',
-                    'Latest'
+                    buildFsDirentItem('13.10', true, true),
+                    buildFsDirentItem('13.10.0.21', false, true),
+                    buildFsDirentItem('13.4', true, false),
+                    buildFsDirentItem('13.4.0.2', false, true),
+                    buildFsDirentItem('13.6', true, false),
+                    buildFsDirentItem('13.6.0.12', false, true),
+                    buildFsDirentItem('6_4_0', false, false),
+                    buildFsDirentItem('6_6_0', true, true),
+                    buildFsDirentItem('third_party_folder', false, true),
+                    buildFsDirentItem('Current', true, true),
+                    buildFsDirentItem('Latest', false, false)
                 ]);
+                fsReadFileSpy = jest.spyOn(fs, 'readFileSync');
+                fsReadFileSpy.mockImplementation(filepath => path.basename(path.dirname(filepath)));
             });
 
             afterEach(() => {
@@ -53,7 +62,6 @@ selectors.forEach(selector => {
                 const expectedVersions = [
                     '13.4.0.2', //
                     '13.6.0.12',
-                    '13.8.3.0',
                     '13.10.0.21'
                 ];
                 expect(sel.getAllVersions()).toEqual(expectedVersions);
@@ -127,13 +135,13 @@ describe('MonoToolSelector', () => {
             sel.setVersion('1.2.3.4');
             expect(coreExportVariableSpy).toHaveBeenCalledWith(
                 'DYLD_LIBRARY_FALLBACK_PATH',
-                `/Library/Frameworks/Mono.framework/Versions/1.2.3.4/lib:/lib:/usr/lib:${process.env['DYLD_LIBRARY_FALLBACK_PATH'] ?? ''}`
+                `/Library/Frameworks/Mono.framework/Versions/1.2.3/lib:/lib:/usr/lib:${process.env['DYLD_LIBRARY_FALLBACK_PATH'] ?? ''}`
             );
             expect(coreExportVariableSpy).toHaveBeenCalledWith(
                 'PKG_CONFIG_PATH',
-                `/Library/Frameworks/Mono.framework/Versions/1.2.3.4/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/1.2.3.4/share/pkgconfig:${process.env['PKG_CONFIG_PATH'] ?? ''}`
+                `/Library/Frameworks/Mono.framework/Versions/1.2.3/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/1.2.3/share/pkgconfig:${process.env['PKG_CONFIG_PATH'] ?? ''}`
             );
-            expect(coreAddPathSpy).toHaveBeenCalledWith('/Library/Frameworks/Mono.framework/Versions/1.2.3.4/bin');
+            expect(coreAddPathSpy).toHaveBeenCalledWith('/Library/Frameworks/Mono.framework/Versions/1.2.3/bin');
         });
     });
 });

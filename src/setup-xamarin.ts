@@ -47,6 +47,7 @@ async function run() {
             throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
         }
 
+        /*
         console.log('Mono:');
         (new MonoToolSelector()).getAllVersions().forEach(w => console.log(w));
         console.log('Xamarin.iOS:');
@@ -55,7 +56,7 @@ async function run() {
         (new XamarinMacToolSelector()).getAllVersions().forEach(w => console.log(w));
         console.log('Xamarin.Android:');
         (new XamarinAndroidToolSelector()).getAllVersions().forEach(w => console.log(w));
-        
+        */
 
         invokeSelector('mono-version', MonoToolSelector);
         invokeSelector('xamarin-ios-version', XamarinIosToolSelector);

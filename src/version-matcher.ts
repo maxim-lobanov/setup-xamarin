@@ -1,12 +1,14 @@
 import compareVersions from 'compare-versions';
 
-export const normalizeVersion = (version: string, versionLength: number = 4): string | null => {
+export const normalizeVersion = (version: string): string | null => {
     if (!compareVersions.validate(version)) {
         return null;
     }
 
+    const normalizedLength = 4;
+
     const parts = version.split('.');
-    while (parts.length < versionLength) {
+    while (parts.length < normalizedLength) {
         parts.push('x');
     }
     return parts.join('.');
@@ -21,7 +23,7 @@ export const countVersionDigits = (version: string): number => {
     return parts.length;
 };
 
-export const cutVersion = (version: string, newLength: number): string => {
+export const cutVersionLength = (version: string, newLength: number): string => {
     const parts = version.split('.');
     const newParts = parts.slice(0, newLength);
     return newParts.join('.');

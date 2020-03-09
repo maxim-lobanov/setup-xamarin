@@ -99,9 +99,6 @@ const core = __importStar(__webpack_require__(470));
 const compare_versions_1 = __importDefault(__webpack_require__(247));
 const utils_1 = __webpack_require__(611);
 class ToolSelector {
-    constructor() {
-        this.versionFormatLength = 4; // version folder contains 4 digits, like '/Versions/13.2.1.4'
-    }
     get versionsDirectoryPath() {
         return path.join(this.basePath, 'Versions');
     }
@@ -112,11 +109,8 @@ class ToolSelector {
         const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: 'utf8', withFileTypes: true });
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
-        let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory).map(child => child.name);
+        let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory()).map(child => child.name);
         potentialVersions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
-        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
-        // filter such symlinks and look for only real versions
-        // potentialVersions = potentialVersions.filter(child => normalizeVersion(child, this.versionFormatLength) === child);
         return potentialVersions.sort(compare_versions_1.default);
     }
     setVersion(version) {
@@ -176,10 +170,6 @@ const core = __importStar(__webpack_require__(470));
 const tool_selector_1 = __webpack_require__(136);
 const version_matcher_1 = __webpack_require__(846);
 class MonoToolSelector extends tool_selector_1.ToolSelector {
-    constructor() {
-        super(...arguments);
-        this.versionFormatLength = 3; // version folder contains 3 digits, like '/Versions/6.6.0'
-    }
     get basePath() {
         return '/Library/Frameworks/Mono.framework';
     }
@@ -188,6 +178,7 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
     }
     getAllVersions() {
         const versionsFolders = super.getAllVersions();
+        // we need to look into '/Versions/<version_folder>/version' file for Mono to determine full version
         return versionsFolders.map(version => {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
             const realVersion = fs.readFileSync(versionFile).toString();
@@ -195,7 +186,8 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
         });
     }
     setVersion(version) {
-        version = version_matcher_1.cutVersion(version, this.versionFormatLength);
+        // for Mono, version folder contains only 3 digits instead of full version
+        version = version_matcher_1.cutVersionLength(version, 3);
         super.setVersion(version);
         const versionDirectory = this.getVersionPath(version);
         core.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
@@ -399,14 +391,16 @@ function run() {
             if (process.platform !== 'darwin') {
                 throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
             }
+            /*
             console.log('Mono:');
-            (new mono_selector_1.MonoToolSelector()).getAllVersions().forEach(w => console.log(w));
+            (new MonoToolSelector()).getAllVersions().forEach(w => console.log(w));
             console.log('Xamarin.iOS:');
-            (new xamarin_ios_selector_1.XamarinIosToolSelector()).getAllVersions().forEach(w => console.log(w));
+            (new XamarinIosToolSelector()).getAllVersions().forEach(w => console.log(w));
             console.log('Xamarin.Mac:');
-            (new xamarin_mac_selector_1.XamarinMacToolSelector()).getAllVersions().forEach(w => console.log(w));
+            (new XamarinMacToolSelector()).getAllVersions().forEach(w => console.log(w));
             console.log('Xamarin.Android:');
-            (new xamarin_android_selector_1.XamarinAndroidToolSelector()).getAllVersions().forEach(w => console.log(w));
+            (new XamarinAndroidToolSelector()).getAllVersions().forEach(w => console.log(w));
+            */
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
             invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
@@ -809,12 +803,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const compare_versions_1 = __importDefault(__webpack_require__(247));
-exports.normalizeVersion = (version, versionLength = 4) => {
+exports.normalizeVersion = (version) => {
     if (!compare_versions_1.default.validate(version)) {
         return null;
     }
+    const normalizedLength = 4;
     const parts = version.split('.');
-    while (parts.length < versionLength) {
+    while (parts.length < normalizedLength) {
         parts.push('x');
     }
     return parts.join('.');
@@ -826,7 +821,7 @@ exports.countVersionDigits = (version) => {
     const parts = version.split('.');
     return parts.length;
 };
-exports.cutVersion = (version, newLength) => {
+exports.cutVersionLength = (version, newLength) => {
     const parts = version.split('.');
     const newParts = parts.slice(0, newLength);
     return newParts.join('.');
