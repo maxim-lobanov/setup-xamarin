@@ -2,7 +2,7 @@ on: [push]
 
 jobs:
   setup-xamarin:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     name: Validate setup-xamarin task
     steps:
     - name: setup-xamarin

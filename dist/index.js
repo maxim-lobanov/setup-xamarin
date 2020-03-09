@@ -321,9 +321,13 @@ const invokeSelector = (variableName, selectorClass) => {
     if (!versionSpec) {
         return;
     }
+    const normalizedVersionSpec = version_matcher_1.normalizeVersion(versionSpec);
+    if (!normalizedVersionSpec) {
+        throw new Error('Invalid version');
+    }
     const selector = new selectorClass();
     const availableVersions = selector.getAllVersions();
-    const targetVersion = version_matcher_1.matchVersion(availableVersions, versionSpec);
+    const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec);
     if (!targetVersion) {
         throw new Error('Impossible to find target version');
     }
@@ -332,8 +336,9 @@ const invokeSelector = (variableName, selectorClass) => {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // platform check
-            console.log(process.platform);
+            if (process.platform !== 'darwin') {
+                throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
+            }
             const sel = new xamarin_ios_selector_1.XamarinIosToolSelector();
             sel.getAllVersions().forEach(w => console.log(w));
             invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
@@ -684,13 +689,36 @@ module.exports = require("fs");
 /***/ }),
 
 /***/ 846:
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const compare_versions_1 = __importDefault(__webpack_require__(247));
+exports.normalizeVersion = (version) => {
+    if (!compare_versions_1.default.validate(version)) {
+        return null;
+    }
+    const parts = version.split('.');
+    while (parts.length < 4) {
+        parts.push('x');
+    }
+    return parts.join('.');
+};
 exports.matchVersion = (availableVersions, versionSpec) => {
-    return availableVersions.find(ver => ver === versionSpec);
+    const normalizedVersionSpec = exports.normalizeVersion(versionSpec);
+    if (!normalizedVersionSpec) {
+        return null;
+    }
+    const sortedVersions = availableVersions.sort(compare_versions_1.default).reverse();
+    const version = sortedVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='));
+    if (version) {
+        return version;
+    }
+    return null;
 };
 
 

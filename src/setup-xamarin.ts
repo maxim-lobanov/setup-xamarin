@@ -4,17 +4,22 @@ import { XamarinIosToolSelector } from './xamarin-ios-selector';
 import { XamarinMacToolSelector } from './xamarin-mac-selector';
 import { XamarinAndroidToolSelector } from './xamarin-android-selector';
 import { ToolSelector } from './tool-selector';
-import { matchVersion } from './version-matcher';
+import { matchVersion, normalizeVersion } from './version-matcher';
 
 const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelector }): void => {
     const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
         return;
     }
+    const normalizedVersionSpec = normalizeVersion(versionSpec);
+    if (!normalizedVersionSpec) {
+        throw new Error('Invalid version');
+    }
 
     const selector = new selectorClass();
     const availableVersions = selector.getAllVersions();
-    const targetVersion = matchVersion(availableVersions, versionSpec);
+
+    const targetVersion = matchVersion(availableVersions, normalizedVersionSpec);
     if (!targetVersion) {
         throw new Error('Impossible to find target version');
     }
@@ -24,8 +29,9 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
 
 async function run() {
     try {
-        // platform check
-        console.log(process.platform);
+        if (process.platform !== 'darwin') {
+            throw new Error(`This task is intended only for macOS system. Impossible to run it on '${process.platform}'`);
+        }
 
         const sel = new XamarinIosToolSelector();
         sel.getAllVersions().forEach(w => console.log(w));
