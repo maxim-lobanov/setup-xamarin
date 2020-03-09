@@ -100,10 +100,19 @@ class ToolSelector {
     }
     getAllVersions() {
         let potentialVersions = fs.readdirSync(this.versionsDirectoryPath);
+        console.log('---------------------');
+        console.log('potential versions 1:');
+        potentialVersions.forEach(w => console.log(w));
         potentialVersions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
+        console.log('---------------------');
+        console.log('potential versions 1:');
+        potentialVersions.forEach(w => console.log(w));
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
         potentialVersions = potentialVersions.filter(child => version_matcher_1.normalizeVersion(child) === child);
+        console.log('---------------------');
+        console.log('potential versions 1:');
+        potentialVersions.forEach(w => console.log(w));
         return potentialVersions.sort(compare_versions_1.default);
     }
     setVersion(version) {
