@@ -7,6 +7,8 @@ import { ToolSelector } from './tool-selector';
 import { countVersionDigits, matchVersion, normalizeVersion } from './version-matcher';
 import { EOL } from 'os';
 
+let showVersionMajorMinorWarning = false;
+
 const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelector }): void => {
     const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
@@ -22,11 +24,6 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
     }
     core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
 
-    if (countVersionDigits(versionSpec) > 2) {
-        core.warning(`It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`);
-        core.warning(`Hosted VMs contain the latest patch & build version for each major & minor pair. It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`);
-    }
-
     const availableVersions = selector.getAllVersions();
 
     const targetVersion = matchVersion(availableVersions, normalizedVersionSpec, selector.versionLength);
@@ -40,6 +37,8 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
 
     selector.setVersion(targetVersion);
     core.info(`${selector.toolName} is set to ${targetVersion}`);
+
+    showVersionMajorMinorWarning = showVersionMajorMinorWarning || countVersionDigits(versionSpec) > 2;
 };
 
 async function run() {
@@ -52,6 +51,11 @@ async function run() {
         invokeSelector('xamarin-ios-version', XamarinIosToolSelector);
         invokeSelector('xamarin-mac-version', XamarinMacToolSelector);
         invokeSelector('xamarin-android-version', XamarinAndroidToolSelector);
+
+        if (showVersionMajorMinorWarning) {
+            core.warning(`It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`);
+            core.warning(`Hosted VMs contain the latest patch & build version for each major & minor pair. It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`);
+        }
     } catch (error) {
         core.setFailed(error.message);
     }
