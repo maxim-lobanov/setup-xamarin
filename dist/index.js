@@ -43,6 +43,22 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
+/***/ 32:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LatestVersionKeyword = 'latest';
+exports.WarningMessageMajorMinorVersions = [
+    `It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`,
+    `Hosted VMs contain the latest patch & build version for each major & minor pair.`,
+    `It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`
+].join(' ');
+
+
+/***/ }),
+
 /***/ 87:
 /***/ (function(module) {
 
@@ -359,6 +375,7 @@ const xamarin_mac_selector_1 = __webpack_require__(116);
 const xamarin_android_selector_1 = __webpack_require__(182);
 const version_matcher_1 = __webpack_require__(846);
 const os_1 = __webpack_require__(87);
+const constants_1 = __webpack_require__(32);
 let showVersionMajorMinorWarning = false;
 const invokeSelector = (variableName, selectorClass) => {
     const versionSpec = core.getInput(variableName, { required: false });
@@ -396,11 +413,7 @@ function run() {
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
             invokeSelector('xamarin-android-version', xamarin_android_selector_1.XamarinAndroidToolSelector);
             if (showVersionMajorMinorWarning) {
-                core.warning([
-                    `It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`,
-                    `Hosted VMs contain the latest patch & build version for each major & minor pair.`,
-                    `It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`
-                ].join(' '));
+                core.warning(constants_1.WarningMessageMajorMinorVersions);
             }
         }
         catch (error) {
@@ -793,7 +806,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const compare_versions_1 = __importDefault(__webpack_require__(247));
+const constants_1 = __webpack_require__(32);
 exports.normalizeVersion = (version) => {
+    if (version === constants_1.LatestVersionKeyword) {
+        return 'x.x.x.x';
+    }
     if (!compare_versions_1.default.validate(version)) {
         return null;
     }
@@ -821,6 +838,7 @@ exports.matchVersion = (availableVersions, versionSpec) => {
     if (!normalizedVersionSpec) {
         return null;
     }
+    // sort versions array by descending to make sure that the newest version will be picked up
     const sortedVersions = availableVersions.sort(compare_versions_1.default).reverse();
     const version = sortedVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='));
     if (version) {

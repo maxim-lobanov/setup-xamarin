@@ -1,6 +1,11 @@
 import compareVersions from 'compare-versions';
+import { LatestVersionKeyword } from './constants';
 
 export const normalizeVersion = (version: string): string | null => {
+    if (version === LatestVersionKeyword) {
+        return 'x.x.x.x';
+    }
+
     if (!compareVersions.validate(version)) {
         return null;
     }
@@ -35,6 +40,7 @@ export const matchVersion = (availableVersions: string[], versionSpec: string): 
         return null;
     }
 
+    // sort versions array by descending to make sure that the newest version will be picked up
     const sortedVersions = availableVersions.sort(compareVersions).reverse();
     const version = sortedVersions.find(ver => compareVersions.compare(ver, normalizedVersionSpec, '='));
     if (version) {
