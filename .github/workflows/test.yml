@@ -2,7 +2,7 @@ name: Validate 'setup-xamarin' task (all test cases)
 on: [push]
 
 jobs:
-  valid-versions:
+  partial-versions:
     runs-on: macos-latest
     name: valid versions (should pass)
     steps:
@@ -51,7 +51,7 @@ jobs:
         xamarin-mac-version: 6.6
         xamarin-android-version: 10.1
 
-  invalid-versions:
+  invalid-xamarin-version:
     runs-on: macos-latest
     name: invalid Xamarin.iOS version (should fail)
     steps:

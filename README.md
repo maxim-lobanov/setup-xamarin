@@ -3,6 +3,6 @@ Set up your GitHub Actions workflow with a specific version of Mono &amp; Xamari
 
 
 # To-Do
-1. More test cases?
+1. tslint
 2. Support `latest` keyword?
 3. Update docs

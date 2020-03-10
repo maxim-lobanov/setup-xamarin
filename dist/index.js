@@ -178,7 +178,7 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
     }
     getAllVersions() {
         const versionsFolders = super.getAllVersions();
-        // we have to look into '/Mono.Framework/Versions/<version_folder>/Version' file for Mono to determine full version
+        // we have to look into '/Mono.Framework/Versions/<version_folder>/Version' file for Mono to determine full version with 4 digits
         return versionsFolders.map(version => {
             const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
             const realVersion = fs.readFileSync(versionFile).toString();
