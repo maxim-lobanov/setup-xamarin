@@ -36,7 +36,7 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
 
     core.debug(`${selector.toolName} ${targetVersion} will be set`);
     selector.setVersion(targetVersion);
-    core.info(`${selector.toolName} is set to ${targetVersion}`);
+    core.info(`${selector.toolName} is set to '${targetVersion}'`);
 
     showVersionMajorMinorWarning = showVersionMajorMinorWarning || VersionUtils.countVersionLength(versionSpec) > 2;
 };

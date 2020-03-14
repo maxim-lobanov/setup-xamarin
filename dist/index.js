@@ -390,7 +390,7 @@ const invokeSelector = (variableName, selectorClass) => {
     }
     core.debug(`${selector.toolName} ${targetVersion} will be set`);
     selector.setVersion(targetVersion);
-    core.info(`${selector.toolName} is set to ${targetVersion}`);
+    core.info(`${selector.toolName} is set to '${targetVersion}'`);
     showVersionMajorMinorWarning = showVersionMajorMinorWarning || version_utils_1.VersionUtils.countVersionLength(versionSpec) > 2;
 };
 const run = () => {

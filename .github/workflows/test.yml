@@ -10,7 +10,7 @@ jobs:
       uses: actions/checkout@master
 
     - name: setup-xamarin
-      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      uses: ./
       with:
         mono-version: 6.6
         xamarin-ios-version: 13.8
@@ -28,7 +28,7 @@ jobs:
       uses: actions/checkout@master
 
     - name: setup-xamarin
-      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      uses: ./
       with:
         mono-version: latest
         xamarin-ios-version: latest
@@ -43,7 +43,7 @@ jobs:
       uses: actions/checkout@master
 
     - name: setup-xamarin
-      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      uses: ./
       with:
         mono-version: 6.6.0.166
         xamarin-ios-version: 13.10.0.21
@@ -59,7 +59,7 @@ jobs:
     steps:
     - name: setup-xamarin
       id: test
-      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      uses: ./
       with:
         mono-version: 6.6
         xamarin-ios-version: 13.8
@@ -72,7 +72,7 @@ jobs:
     steps:
     - name: setup-xamarin
       id: test
-      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      uses: ./
       with:
         mono-version: 6.6
         xamarin-ios-version: 11.1 # this versino doesn't exist
@@ -85,7 +85,7 @@ jobs:
     steps:
     - name: setup-xamarin
       id: test
-      uses: maxim-lobanov/setup-xamarin@implement-first-version
+      uses: ./
       with:
         mono-version: 5.8
         xamarin-ios-version: 13.8
