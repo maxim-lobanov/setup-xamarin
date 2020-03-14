@@ -22,17 +22,17 @@ const buildFsDirentItem = (name: string, opt: { isSymbolicLink: boolean; isDirec
 };
 
 const fakeReadDirResults = [
-    buildFsDirentItem("13.10", { isSymbolicLink: true, isDirectory: true}),
-    buildFsDirentItem("13.10.0.21", { isSymbolicLink: false, isDirectory: true}),
-    buildFsDirentItem("13.4", { isSymbolicLink: true, isDirectory: false}),
-    buildFsDirentItem("13.4.0.2", { isSymbolicLink: false, isDirectory: true}),
-    buildFsDirentItem("13.6", { isSymbolicLink: true, isDirectory: false}),
-    buildFsDirentItem("13.6.0.12", { isSymbolicLink: false, isDirectory: true}),
-    buildFsDirentItem("6_4_0", { isSymbolicLink: false, isDirectory: false}),
-    buildFsDirentItem("6_6_0", { isSymbolicLink: true, isDirectory: true}),
-    buildFsDirentItem("third_party_folder", { isSymbolicLink: false, isDirectory: true}),
-    buildFsDirentItem("Current", { isSymbolicLink: true, isDirectory: true}),
-    buildFsDirentItem("Latest", { isSymbolicLink: false, isDirectory: false})
+    buildFsDirentItem("13.10", { isSymbolicLink: true, isDirectory: true }),
+    buildFsDirentItem("13.10.0.21", { isSymbolicLink: false, isDirectory: true }),
+    buildFsDirentItem("13.4", { isSymbolicLink: true, isDirectory: false }),
+    buildFsDirentItem("13.4.0.2", { isSymbolicLink: false, isDirectory: true }),
+    buildFsDirentItem("13.6", { isSymbolicLink: true, isDirectory: false }),
+    buildFsDirentItem("13.6.0.12", { isSymbolicLink: false, isDirectory: true }),
+    buildFsDirentItem("6_4_0", { isSymbolicLink: false, isDirectory: false }),
+    buildFsDirentItem("6_6_0", { isSymbolicLink: true, isDirectory: true }),
+    buildFsDirentItem("third_party_folder", { isSymbolicLink: false, isDirectory: true }),
+    buildFsDirentItem("Current", { isSymbolicLink: true, isDirectory: true }),
+    buildFsDirentItem("Latest", { isSymbolicLink: false, isDirectory: false })
 ];
 
 const fakeGetVersionsResult = [

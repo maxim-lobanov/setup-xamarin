@@ -42,7 +42,7 @@ describe("VersionUtils", () => {
             ["5.2.3.1", 4, "5.2.3.1"],
             ["5.2.3.1", 3, "5.2.3"],
             ["5.2.3.1", 2, "5.2"],
-            ["5.2.3.1", 1, "5"],
+            ["5.2.3.1", 1, "5"]
         ])("'%s', %d -> '%s'", (version: string, newLength: number, expected: string) => {
             expect(VersionUtils.cutVersionLength(version, newLength)).toBe(expected);
         });

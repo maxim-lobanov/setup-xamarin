@@ -370,12 +370,12 @@ const xamarin_android_selector_1 = __webpack_require__(182);
 const os_1 = __webpack_require__(87);
 const version_utils_1 = __webpack_require__(957);
 let showVersionMajorMinorWarning = false;
-const invokeSelector = (variableName, selectorClass) => {
+const invokeSelector = (variableName, toolSelector) => {
     const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
         return;
     }
-    const selector = new selectorClass();
+    const selector = new toolSelector();
     if (!version_utils_1.VersionUtils.latestVersionKeyword(versionSpec) && !version_utils_1.VersionUtils.validVersion(versionSpec)) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }

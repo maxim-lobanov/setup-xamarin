@@ -3,6 +3,7 @@ import { EOL } from "os";
 
 export const invokeCommandSync = (command: string, args: string[], sudo: boolean): void => {
     let execResult: child.SpawnSyncReturns<string>;
+
     if (sudo) {
         execResult = child.spawnSync("sudo", [command, ...args]);
     } else {

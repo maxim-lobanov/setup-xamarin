@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc && ncc build",
     "test": "jest",
-    "lint": "npx eslint **/*.ts"
+    "lint": "npx eslint **/*.ts",
+    "pre-commit": "npm run build && npm run test && npm run lint"
   },
   "repository": {
     "type": "git",

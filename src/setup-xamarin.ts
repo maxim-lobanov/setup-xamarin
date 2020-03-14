@@ -9,13 +9,13 @@ import { ToolSelector } from "./tool-selector";
 
 let showVersionMajorMinorWarning = false;
 
-const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelector }): void => {
+const invokeSelector = (variableName: string, toolSelector: { new (): ToolSelector }): void => {
     const versionSpec = core.getInput(variableName, { required: false });
     if (!versionSpec) {
         return;
     }
 
-    const selector = new selectorClass();
+    const selector = new toolSelector();
 
     if (!VersionUtils.latestVersionKeyword(versionSpec) && !VersionUtils.validVersion(versionSpec)) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
