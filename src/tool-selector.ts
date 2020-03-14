@@ -60,4 +60,9 @@ export abstract class ToolSelector {
 
         invokeCommandSync('ln', ['-s', targetVersionDirectory, currentVersionDirectory], true);
     }
+
+    public static toString(): string {
+        // show correct name for test suite
+        return this.name;
+    }
 }

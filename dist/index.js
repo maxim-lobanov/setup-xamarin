@@ -119,12 +119,13 @@ class ToolSelector {
         var _a;
         const availableVersions = this.getAllVersions();
         if (availableVersions.length === 0) {
-            throw new Error('');
+            return null;
         }
         if (versionSpec === 'latest') {
             return availableVersions[0];
         }
         const normalizedVersionSpec = version_utils_1.VersionUtils.normalizeVersion(versionSpec);
+        core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
         return (_a = availableVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='))) !== null && _a !== void 0 ? _a : null;
     }
     setVersion(version) {
@@ -138,6 +139,10 @@ class ToolSelector {
             utils_1.invokeCommandSync('rm', ['-f', currentVersionDirectory], true);
         }
         utils_1.invokeCommandSync('ln', ['-s', targetVersionDirectory, currentVersionDirectory], true);
+    }
+    static toString() {
+        // show correct name for test suite
+        return this.name;
     }
 }
 exports.ToolSelector = ToolSelector;
@@ -816,7 +821,7 @@ VersionUtils.normalizeVersion = (version) => {
     while (versionParts.length < 4) {
         versionParts.push('x');
     }
-    return versionParts.join('.');
+    return VersionUtils.buildVersionFromParts(versionParts);
 };
 VersionUtils.countVersionLength = (version) => {
     return VersionUtils.splitVersionToParts(version).length;

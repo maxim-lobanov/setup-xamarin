@@ -9,142 +9,138 @@ import { ToolSelector } from '../src/tool-selector';
 import * as utils from '../src/utils';
 import compareVersions from 'compare-versions';
 
-const selectors: { new (): ToolSelector }[] = [
-    MonoToolSelector, //
-    XamarinIosToolSelector,
-    XamarinMacToolSelector,
-    XamarinAndroidToolSelector
-];
-
 jest.mock('fs');
 jest.mock('@actions/core');
 jest.mock('../src/utils');
 
-const buildFsDirentItem = (name: string, isSymbolicLink: boolean, isDirectory: boolean) => {
+const buildFsDirentItem = (name: string, opt: { isSymbolicLink: boolean, isDirectory: boolean }) => {
     return {
         name,
-        isSymbolicLink: () => isSymbolicLink,
-        isDirectory: () => isDirectory
+        isSymbolicLink: () => opt.isSymbolicLink,
+        isDirectory: () => opt.isDirectory
     };
 };
 
-selectors.forEach(selector => {
-    describe(selector.name, () => {
-        describe('getAllVersions', () => {
-            let fsReadDirSpy: jest.SpyInstance;
-            let fsReadFileSpy: jest.SpyInstance;
+const fakeReadDirResults = [
+    buildFsDirentItem('13.10', { isSymbolicLink: true, isDirectory: true}),
+    buildFsDirentItem('13.10.0.21', { isSymbolicLink: false, isDirectory: true}),
+    buildFsDirentItem('13.4', { isSymbolicLink: true, isDirectory: false}),
+    buildFsDirentItem('13.4.0.2', { isSymbolicLink: false, isDirectory: true}),
+    buildFsDirentItem('13.6', { isSymbolicLink: true, isDirectory: false}),
+    buildFsDirentItem('13.6.0.12', { isSymbolicLink: false, isDirectory: true}),
+    buildFsDirentItem('6_4_0', { isSymbolicLink: false, isDirectory: false}),
+    buildFsDirentItem('6_6_0', { isSymbolicLink: true, isDirectory: true}),
+    buildFsDirentItem('third_party_folder', { isSymbolicLink: false, isDirectory: true}),
+    buildFsDirentItem('Current', { isSymbolicLink: true, isDirectory: true}),
+    buildFsDirentItem('Latest', { isSymbolicLink: false, isDirectory: false})
+] as fs.Dirent[];
 
-            beforeEach(() => {
-                fsReadDirSpy = jest.spyOn(fs, 'readdirSync');
-                fsReadDirSpy.mockImplementation(() => [
-                    buildFsDirentItem('13.10', true, true),
-                    buildFsDirentItem('13.10.0.21', false, true),
-                    buildFsDirentItem('13.4', true, false),
-                    buildFsDirentItem('13.4.0.2', false, true),
-                    buildFsDirentItem('13.6', true, false),
-                    buildFsDirentItem('13.6.0.12', false, true),
-                    buildFsDirentItem('6_4_0', false, false),
-                    buildFsDirentItem('6_6_0', true, true),
-                    buildFsDirentItem('third_party_folder', false, true),
-                    buildFsDirentItem('Current', true, true),
-                    buildFsDirentItem('Latest', false, false)
-                ]);
-                fsReadFileSpy = jest.spyOn(fs, 'readFileSync');
-                fsReadFileSpy.mockImplementation(filepath => path.basename(path.dirname(filepath)));
-            });
+const fakeGetVersionsResult = [
+    '13.2.0.47',
+    '13.4.0.2',
+    '13.6.0.12',
+    '13.8.2.9',
+    '13.8.3.0',
+    '13.8.3.2',
+    '13.9.1.0',
+    '13.10.0.21',
+    '14.0.2.1'
+].sort(compareVersions).reverse();
 
-            afterEach(() => {
-                jest.resetAllMocks();
-                jest.clearAllMocks();
-            });
+describe.each([
+    MonoToolSelector,
+    XamarinIosToolSelector,
+    XamarinMacToolSelector,
+    XamarinAndroidToolSelector
+])('%s', (selectorClass: { new (): ToolSelector }) => {
+    describe('getAllVersions', () => {
+        let fsReadDirSpy: jest.SpyInstance;
+        let fsReadFileSpy: jest.SpyInstance;
 
-            it('versions are filtered correctly', () => {
-                const sel = new selector();
-                const expectedVersions = [
-                    '13.10.0.21',
-                    '13.6.0.12',
-                    '13.4.0.2'
-                ];
-                expect(sel.getAllVersions()).toEqual(expectedVersions);
-            });
+        beforeEach(() => {
+            fsReadDirSpy = jest.spyOn(fs, 'readdirSync').mockImplementation(() => fakeReadDirResults);
+            fsReadFileSpy = jest.spyOn(fs, 'readFileSync').mockImplementation(filepath => path.basename(path.dirname(filepath.toString())));
         });
 
-        describe('findVersion', () => {
-            const mockedVersions = [
-                '13.2.0.47',
-                '13.4.0.2',
-                '13.6.0.12',
-                '13.8.2.9',
-                '13.8.3.0',
-                '13.8.3.2',
-                '13.9.1.0',
+        afterEach(() => {
+            jest.resetAllMocks();
+            jest.clearAllMocks();
+        });
+
+        it('versions are filtered correctly', () => {
+            const sel = new selectorClass();
+            const expectedVersions = [
                 '13.10.0.21',
-                '14.0.2.1'
-            ].sort(compareVersions).reverse();
+                '13.6.0.12',
+                '13.4.0.2'
+            ];
+            expect(sel.getAllVersions()).toEqual(expectedVersions);
+        });
+    });
 
-            it.each(<[string, string | null, string][]>[
-                ['latest', '14.0.2.1', 'latest is matched'],
-                ['14', '14.0.2.1', 'one digit is matched'],
-                ['13', '13.10.0.21', 'one digit is matched and latest version is selected'],
-                ['11', null, 'one digit is not matched'],
-                ['14.0', '14.0.2.1', 'two digits are matched'],
-                ['13.8', '13.8.3.2', 'two digits are matched and latest version is selected'],
-                ['13.7', null, 'two digits are not matched'],
-                ['11.0', null, 'two digits are not matched'],
-                ['13.2.0', '13.2.0.47', 'three digits are matched'],
-                ['13.8.3', '13.8.3.2', 'three digits are matched and latest version is selected'],
-                ['11.0.2', null, 'three digits are not matched'],
-                ['13.5.4', null, 'three digits are not matched'],
-                ['13.8.1', null, 'three digits are not matched'],
-                ['13.9.1.0', '13.9.1.0', 'four digits are matched'],
-                ['13.10.0.22', null, 'four digits are not matched']
-            ])(`'%s' -> '%s' (%s)`, (versionSpec: string, expected: string | null) => {
-                const sel = new selector();
-                sel.getAllVersions = () => mockedVersions;
-                const matchedVersion = sel.findVersion(versionSpec);
-                expect(matchedVersion).toBe(expected);
-            });
+    describe('findVersion', () => {
+        it.each(<[string, string | null, string][]>[
+            ['latest', '14.0.2.1', 'latest is matched'],
+            ['14', '14.0.2.1', 'one digit is matched'],
+            ['13', '13.10.0.21', 'one digit is matched and latest version is selected'],
+            ['11', null, 'one digit is not matched'],
+            ['14.0', '14.0.2.1', 'two digits are matched'],
+            ['13.8', '13.8.3.2', 'two digits are matched and latest version is selected'],
+            ['13.7', null, 'two digits are not matched'],
+            ['11.0', null, 'two digits are not matched'],
+            ['13.2.0', '13.2.0.47', 'three digits are matched'],
+            ['13.8.3', '13.8.3.2', 'three digits are matched and latest version is selected'],
+            ['11.0.2', null, 'three digits are not matched'],
+            ['13.5.4', null, 'three digits are not matched'],
+            ['13.8.1', null, 'three digits are not matched'],
+            ['13.9.1.0', '13.9.1.0', 'four digits are matched'],
+            ['13.10.0.22', null, 'four digits are not matched']
+        ])(`'%s' -> '%s' (%s)`, (versionSpec: string, expected: string | null) => {
+            const sel = new selectorClass();
+            sel.getAllVersions = () => fakeGetVersionsResult;
+            const matchedVersion = sel.findVersion(versionSpec);
+            expect(matchedVersion).toBe(expected);
+        });
+    });
+
+    describe('setVersion', () => {
+        let fsExistsSpy: jest.SpyInstance;
+        let fsInvokeCommandSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            fsExistsSpy = jest.spyOn(fs, 'existsSync');
+            fsInvokeCommandSpy = jest.spyOn(utils, 'invokeCommandSync');
         });
 
-        describe('setVersion', () => {
-            let fsExistsSpy: jest.SpyInstance;
-            let fsInvokeCommandSpy: jest.SpyInstance;
+        afterEach(() => {
+            jest.resetAllMocks();
+            jest.clearAllMocks();
+        });
 
-            beforeEach(() => {
-                fsExistsSpy = jest.spyOn(fs, 'existsSync');
-                fsInvokeCommandSpy = jest.spyOn(utils, 'invokeCommandSync');
+        it('symlink is created', () => {
+            fsExistsSpy.mockImplementation((path: string) => {
+                return !path.endsWith('/Current');
             });
+            const sel = new selectorClass();
+            sel.setVersion('1.2.3.4');
+            expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(1);
+            expect(fsInvokeCommandSpy).toHaveBeenCalledWith('ln', expect.any(Array), true);
+        });
 
-            afterEach(() => {
-                jest.resetAllMocks();
-                jest.clearAllMocks();
-            });
+        it('symlink is recreated', () => {
+            fsExistsSpy.mockImplementation(() => true);
+            const sel = new selectorClass();
+            sel.setVersion('1.2.3.4');
+            expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(2);
+            expect(fsInvokeCommandSpy).toHaveBeenCalledWith('rm', expect.any(Array), true);
+            expect(fsInvokeCommandSpy).toHaveBeenCalledWith('ln', expect.any(Array), true);
+        });
 
-            it('symlink is created', () => {
-                fsExistsSpy.mockImplementation((path: string) => {
-                    return !path.endsWith('/Current');
-                });
-                const sel = new selector();
-                sel.setVersion('1.2.3.4');
-                expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(1);
-                expect(fsInvokeCommandSpy).toHaveBeenCalledWith('ln', expect.any(Array), true);
-            });
-
-            it('symlink is recreated', () => {
-                fsExistsSpy.mockImplementation(() => true);
-                const sel = new selector();
-                sel.setVersion('1.2.3.4');
-                expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(2);
-                expect(fsInvokeCommandSpy).toHaveBeenCalledWith('rm', expect.any(Array), true);
-                expect(fsInvokeCommandSpy).toHaveBeenCalledWith('ln', expect.any(Array), true);
-            });
-
-            it(`error is thrown if version doesn't exist`, () => {
-                fsExistsSpy.mockImplementation(() => false);
-                const sel = new selector();
-                expect(() => sel.setVersion('1.2.3.4')).toThrow();
-                expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(0);
-            });
+        it(`error is thrown if version doesn't exist`, () => {
+            fsExistsSpy.mockImplementation(() => false);
+            const sel = new selectorClass();
+            expect(() => sel.setVersion('1.2.3.4')).toThrow();
+            expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(0);
         });
     });
 });

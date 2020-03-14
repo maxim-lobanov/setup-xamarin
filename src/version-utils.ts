@@ -11,7 +11,7 @@ export class VersionUtils {
             versionParts.push('x');
         }
 
-        return versionParts.join('.');
+        return VersionUtils.buildVersionFromParts(versionParts);
     }
 
     public static countVersionLength = (version: string): number => {
