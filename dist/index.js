@@ -59,10 +59,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tool_selector_1 = __webpack_require__(136);
 class XamarinMacToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
-        return 'Xamarin.Mac';
+        return "Xamarin.Mac";
     }
     get basePath() {
-        return '/Library/Frameworks/Xamarin.Mac.framework';
+        return "/Library/Frameworks/Xamarin.Mac.framework";
     }
 }
 exports.XamarinMacToolSelector = XamarinMacToolSelector;
@@ -101,13 +101,13 @@ const utils_1 = __webpack_require__(611);
 const version_utils_1 = __webpack_require__(957);
 class ToolSelector {
     get versionsDirectoryPath() {
-        return path.join(this.basePath, 'Versions');
+        return path.join(this.basePath, "Versions");
     }
     getVersionPath(version) {
         return path.join(this.versionsDirectoryPath, version);
     }
     getAllVersions() {
-        const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: 'utf8', withFileTypes: true });
+        const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: "utf8", withFileTypes: true });
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
         let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory()).map(child => child.name);
@@ -121,24 +121,24 @@ class ToolSelector {
         if (availableVersions.length === 0) {
             return null;
         }
-        if (versionSpec === 'latest') {
+        if (versionSpec === "latest") {
             return availableVersions[0];
         }
         const normalizedVersionSpec = version_utils_1.VersionUtils.normalizeVersion(versionSpec);
         core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
-        return (_a = availableVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='))) !== null && _a !== void 0 ? _a : null;
+        return (_a = availableVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, "="))) !== null && _a !== void 0 ? _a : null;
     }
     setVersion(version) {
         const targetVersionDirectory = this.getVersionPath(version);
         if (!fs.existsSync(targetVersionDirectory)) {
             throw new Error(`Invalid version: Directory '${targetVersionDirectory}' doesn't exist`);
         }
-        const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
+        const currentVersionDirectory = path.join(this.versionsDirectoryPath, "Current");
         core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
-            utils_1.invokeCommandSync('rm', ['-f', currentVersionDirectory], true);
+            utils_1.invokeCommandSync("rm", ["-f", currentVersionDirectory], true);
         }
-        utils_1.invokeCommandSync('ln', ['-s', targetVersionDirectory, currentVersionDirectory], true);
+        utils_1.invokeCommandSync("ln", ["-s", targetVersionDirectory, currentVersionDirectory], true);
     }
     static toString() {
         // show correct name for test suite
@@ -159,10 +159,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tool_selector_1 = __webpack_require__(136);
 class XamarinAndroidToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
-        return 'Xamarin.Android';
+        return "Xamarin.Android";
     }
     get basePath() {
-        return '/Library/Frameworks/Xamarin.Android.framework';
+        return "/Library/Frameworks/Xamarin.Android.framework";
     }
 }
 exports.XamarinAndroidToolSelector = XamarinAndroidToolSelector;
@@ -190,16 +190,16 @@ const tool_selector_1 = __webpack_require__(136);
 const version_utils_1 = __webpack_require__(957);
 class MonoToolSelector extends tool_selector_1.ToolSelector {
     get basePath() {
-        return '/Library/Frameworks/Mono.framework';
+        return "/Library/Frameworks/Mono.framework";
     }
     get toolName() {
-        return 'Mono';
+        return "Mono";
     }
     getAllVersions() {
         const versionsFolders = super.getAllVersions();
         // we have to look into '/Mono.Framework/Versions/<version_folder>/Version' file for Mono to determine full version with 4 digits
         return versionsFolders.map(version => {
-            const versionFile = path.join(this.versionsDirectoryPath, version, 'Version');
+            const versionFile = path.join(this.versionsDirectoryPath, version, "Version");
             const realVersion = fs.readFileSync(versionFile).toString();
             return realVersion.trim();
         });
@@ -209,16 +209,16 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
         version = version_utils_1.VersionUtils.cutVersionLength(version, 3);
         super.setVersion(version);
         const versionDirectory = this.getVersionPath(version);
-        core.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
+        core.exportVariable("DYLD_LIBRARY_FALLBACK_PATH", [
             `${versionDirectory}/lib`,
-            '/lib',
-            '/usr/lib',
-            process.env['DYLD_LIBRARY_FALLBACK_PATH']
+            "/lib",
+            "/usr/lib",
+            process.env["DYLD_LIBRARY_FALLBACK_PATH"]
         ].join(path.delimiter));
-        core.exportVariable('PKG_CONFIG_PATH', [
+        core.exportVariable("PKG_CONFIG_PATH", [
             `${versionDirectory}/lib/pkgconfig`,
             `${versionDirectory}/share/pkgconfig`,
-            process.env['PKG_CONFIG_PATH']
+            process.env["PKG_CONFIG_PATH"]
         ].join(path.delimiter));
         core.debug(`Add '${versionDirectory}/bin' to PATH`);
         core.addPath(`${versionDirectory}/bin`);
@@ -354,15 +354,6 @@ exports.MonoToolSelector = MonoToolSelector;
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -393,7 +384,7 @@ const invokeSelector = (variableName, selectorClass) => {
     if (!targetVersion) {
         throw new Error([
             `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec}`,
-            'Available versions:',
+            "Available versions:",
             ...selector.getAllVersions().map(ver => `- ${ver}`)
         ].join(os_1.EOL));
     }
@@ -402,29 +393,27 @@ const invokeSelector = (variableName, selectorClass) => {
     core.info(`${selector.toolName} is set to ${targetVersion}`);
     showVersionMajorMinorWarning = showVersionMajorMinorWarning || version_utils_1.VersionUtils.countVersionLength(versionSpec) > 2;
 };
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            if (process.platform !== 'darwin') {
-                throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
-            }
-            invokeSelector('mono-version', mono_selector_1.MonoToolSelector);
-            invokeSelector('xamarin-ios-version', xamarin_ios_selector_1.XamarinIosToolSelector);
-            invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
-            invokeSelector('xamarin-android-version', xamarin_android_selector_1.XamarinAndroidToolSelector);
-            if (showVersionMajorMinorWarning) {
-                core.warning([
-                    `It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`,
-                    `Hosted VMs contain the latest patch & build version for each major & minor pair.`,
-                    `It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`
-                ].join(' '));
-            }
+const run = () => {
+    try {
+        if (process.platform !== "darwin") {
+            throw new Error(`This task is intended only for macOS platform. It can't be run on '${process.platform}' platform`);
         }
-        catch (error) {
-            core.setFailed(error.message);
+        invokeSelector("mono-version", mono_selector_1.MonoToolSelector);
+        invokeSelector("xamarin-ios-version", xamarin_ios_selector_1.XamarinIosToolSelector);
+        invokeSelector("xamarin-mac-version", xamarin_mac_selector_1.XamarinMacToolSelector);
+        invokeSelector("xamarin-android-version", xamarin_android_selector_1.XamarinAndroidToolSelector);
+        if (showVersionMajorMinorWarning) {
+            core.warning([
+                "It is recommended to specify only major and minor versions of tool (like '13' or '13.2').",
+                "Hosted VMs contain the latest patch & build version for each major & minor pair.",
+                "It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing."
+            ].join(" "));
         }
-    });
-}
+    }
+    catch (error) {
+        core.setFailed(error.message);
+    }
+};
 run();
 
 
@@ -740,10 +729,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tool_selector_1 = __webpack_require__(136);
 class XamarinIosToolSelector extends tool_selector_1.ToolSelector {
     get toolName() {
-        return 'Xamarin.iOS';
+        return "Xamarin.iOS";
     }
     get basePath() {
-        return '/Library/Frameworks/Xamarin.iOS.framework';
+        return "/Library/Frameworks/Xamarin.iOS.framework";
     }
 }
 exports.XamarinIosToolSelector = XamarinIosToolSelector;
@@ -769,14 +758,14 @@ const os_1 = __webpack_require__(87);
 exports.invokeCommandSync = (command, args, sudo) => {
     let execResult;
     if (sudo) {
-        execResult = child.spawnSync('sudo', [command, ...args]);
+        execResult = child.spawnSync("sudo", [command, ...args]);
     }
     else {
         execResult = child.spawnSync(command, args);
     }
     if (execResult.status !== 0) {
         throw new Error([
-            `Error during run ${sudo ? 'sudo ' : ''}${command} ${args.join(' ')}`,
+            `Error during run ${sudo ? "sudo " : ""}${command} ${args.join(" ")}`,
             execResult.stderr,
             execResult.stdout
         ].join(os_1.EOL));
@@ -819,7 +808,7 @@ VersionUtils.validVersion = (version) => {
 VersionUtils.normalizeVersion = (version) => {
     const versionParts = VersionUtils.splitVersionToParts(version);
     while (versionParts.length < 4) {
-        versionParts.push('x');
+        versionParts.push("x");
     }
     return VersionUtils.buildVersionFromParts(versionParts);
 };
@@ -832,10 +821,10 @@ VersionUtils.cutVersionLength = (version, newLength) => {
     return VersionUtils.buildVersionFromParts(newParts);
 };
 VersionUtils.splitVersionToParts = (version) => {
-    return version.split('.');
+    return version.split(".");
 };
 VersionUtils.buildVersionFromParts = (versionParts) => {
-    return versionParts.join('.');
+    return versionParts.join(".");
 };
 
 

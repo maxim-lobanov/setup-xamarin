@@ -23,4 +23,4 @@ jobs:
       run: npm run test
 
     - name: Lint
-      run: npm run format-check
+      run: npm run list

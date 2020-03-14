@@ -1,9 +1,9 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as core from '@actions/core';
-import compareVersions from 'compare-versions';
-import { invokeCommandSync } from './utils';
-import { VersionUtils } from './version-utils';
+import * as fs from "fs";
+import * as path from "path";
+import * as core from "@actions/core";
+import compareVersions from "compare-versions";
+import { invokeCommandSync } from "./utils";
+import { VersionUtils } from "./version-utils";
 
 export abstract class ToolSelector {
     public abstract get toolName(): string;
@@ -11,7 +11,7 @@ export abstract class ToolSelector {
     protected abstract get basePath(): string;
 
     protected get versionsDirectoryPath(): string {
-        return path.join(this.basePath, 'Versions');
+        return path.join(this.basePath, "Versions");
     }
 
     protected getVersionPath(version: string): string {
@@ -19,7 +19,7 @@ export abstract class ToolSelector {
     }
 
     public getAllVersions(): string[] {
-        const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: 'utf8', withFileTypes: true });
+        const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: "utf8", withFileTypes: true });
 
         // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
         // filter such symlinks and look for only real versions
@@ -36,14 +36,14 @@ export abstract class ToolSelector {
             return null;
         }
 
-        if (versionSpec === 'latest') {
+        if (versionSpec === "latest") {
             return availableVersions[0];
         }
 
         const normalizedVersionSpec = VersionUtils.normalizeVersion(versionSpec);
         core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
 
-        return availableVersions.find(ver => compareVersions.compare(ver, normalizedVersionSpec, '=')) ?? null;
+        return availableVersions.find(ver => compareVersions.compare(ver, normalizedVersionSpec, "=")) ?? null;
     }
 
     public setVersion(version: string): void {
@@ -52,13 +52,13 @@ export abstract class ToolSelector {
             throw new Error(`Invalid version: Directory '${targetVersionDirectory}' doesn't exist`);
         }
 
-        const currentVersionDirectory = path.join(this.versionsDirectoryPath, 'Current');
+        const currentVersionDirectory = path.join(this.versionsDirectoryPath, "Current");
         core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
         if (fs.existsSync(currentVersionDirectory)) {
-            invokeCommandSync('rm', ['-f', currentVersionDirectory], true);
+            invokeCommandSync("rm", ["-f", currentVersionDirectory], true);
         }
 
-        invokeCommandSync('ln', ['-s', targetVersionDirectory, currentVersionDirectory], true);
+        invokeCommandSync("ln", ["-s", targetVersionDirectory, currentVersionDirectory], true);
     }
 
     public static toString(): string {
