@@ -5,6 +5,10 @@ export class VersionUtils {
         return compareVersions.validate(version);
     }
 
+    public static latestVersionKeyword = (version: string): boolean => {
+        return version === "latest";
+    }
+
     public static normalizeVersion = (version: string): string => {
         const versionParts = VersionUtils.splitVersionToParts(version);
         while(versionParts.length < 4) {

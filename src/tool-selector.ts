@@ -36,7 +36,7 @@ export abstract class ToolSelector {
             return null;
         }
 
-        if (versionSpec === "latest") {
+        if (VersionUtils.latestVersionKeyword(versionSpec)) {
             return availableVersions[0];
         }
 

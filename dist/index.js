@@ -121,7 +121,7 @@ class ToolSelector {
         if (availableVersions.length === 0) {
             return null;
         }
-        if (versionSpec === "latest") {
+        if (version_utils_1.VersionUtils.latestVersionKeyword(versionSpec)) {
             return availableVersions[0];
         }
         const normalizedVersionSpec = version_utils_1.VersionUtils.normalizeVersion(versionSpec);
@@ -376,7 +376,7 @@ const invokeSelector = (variableName, selectorClass) => {
         return;
     }
     const selector = new selectorClass();
-    if (!version_utils_1.VersionUtils.validVersion(versionSpec)) {
+    if (!version_utils_1.VersionUtils.latestVersionKeyword(versionSpec) && !version_utils_1.VersionUtils.validVersion(versionSpec)) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
     core.info(`Switching ${selector.toolName} to version '${versionSpec}'...`);
@@ -804,6 +804,9 @@ class VersionUtils {
 exports.VersionUtils = VersionUtils;
 VersionUtils.validVersion = (version) => {
     return compare_versions_1.default.validate(version);
+};
+VersionUtils.latestVersionKeyword = (version) => {
+    return version === "latest";
 };
 VersionUtils.normalizeVersion = (version) => {
     const versionParts = VersionUtils.splitVersionToParts(version);
