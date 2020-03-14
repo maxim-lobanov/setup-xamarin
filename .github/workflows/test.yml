@@ -35,7 +35,6 @@ jobs:
         xamarin-mac-version: latest
         xamarin-android-version: latest
 
-
   full-versions:
     runs-on: macos-latest
     name: valid full versions (should warn)
@@ -62,9 +61,9 @@ jobs:
       id: test
       uses: maxim-lobanov/setup-xamarin@implement-first-version
       with:
-        mono-version: 5.8
+        mono-version: 6.6
         xamarin-ios-version: 13.8
-        xamarin-mac-version: 6_6_0
+        xamarin-mac-version: 6_6_0 # this version has invalid format
         xamarin-android-version: 10.1
 
   xamarin-version-not-found:
@@ -76,7 +75,7 @@ jobs:
       uses: maxim-lobanov/setup-xamarin@implement-first-version
       with:
         mono-version: 6.6
-        xamarin-ios-version: 11.1
+        xamarin-ios-version: 11.1 # this versino doesn't exist
         xamarin-mac-version: 6.6
         xamarin-android-version: 10.1
 

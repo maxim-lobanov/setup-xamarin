@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as core from '@actions/core';
 import { ToolSelector } from './tool-selector';
-import { cutVersionLength } from './version-matcher';
+import { VersionUtils } from './version-utils';
 
 export class MonoToolSelector extends ToolSelector {
     protected get basePath(): string {
@@ -26,12 +26,11 @@ export class MonoToolSelector extends ToolSelector {
 
     public setVersion(version: string): void {
         // for Mono, version folder contains only 3 digits instead of full version
-        version = cutVersionLength(version, 3);
+        version = VersionUtils.cutVersionLength(version, 3);
 
         super.setVersion(version);
 
         const versionDirectory = this.getVersionPath(version);
-
         core.exportVariable(
             'DYLD_LIBRARY_FALLBACK_PATH',
             [
@@ -41,7 +40,6 @@ export class MonoToolSelector extends ToolSelector {
                 process.env['DYLD_LIBRARY_FALLBACK_PATH']
             ].join(path.delimiter)
         );
-
         core.exportVariable(
             'PKG_CONFIG_PATH',
             [

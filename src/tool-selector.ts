@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as core from '@actions/core';
 import compareVersions from 'compare-versions';
 import { invokeCommandSync } from './utils';
+import { VersionUtils } from './version-utils';
 
 export abstract class ToolSelector {
     public abstract get toolName(): string;
@@ -25,7 +26,24 @@ export abstract class ToolSelector {
         let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory()).map(child => child.name);
         potentialVersions = potentialVersions.filter(child => compareVersions.validate(child));
 
-        return potentialVersions.sort(compareVersions);
+        // sort versions array by descending to make sure that the newest version will be picked up
+        return potentialVersions.sort(compareVersions).reverse();
+    }
+
+    public findVersion(versionSpec: string): string | null {
+        const availableVersions = this.getAllVersions();
+        if (availableVersions.length === 0) {
+            return null;
+        }
+
+        if (versionSpec === 'latest') {
+            return availableVersions[0];
+        }
+
+        const normalizedVersionSpec = VersionUtils.normalizeVersion(versionSpec);
+        core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
+
+        return availableVersions.find(ver => compareVersions.compare(ver, normalizedVersionSpec, '=')) ?? null;
     }
 
     public setVersion(version: string): void {

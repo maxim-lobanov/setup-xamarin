@@ -43,22 +43,6 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
-/***/ 32:
-/***/ (function(__unusedmodule, exports) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LatestVersionKeyword = 'latest';
-exports.WarningMessageMajorMinorVersions = [
-    `It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`,
-    `Hosted VMs contain the latest patch & build version for each major & minor pair.`,
-    `It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`
-].join(' ');
-
-
-/***/ }),
-
 /***/ 87:
 /***/ (function(module) {
 
@@ -114,6 +98,7 @@ const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const compare_versions_1 = __importDefault(__webpack_require__(247));
 const utils_1 = __webpack_require__(611);
+const version_utils_1 = __webpack_require__(957);
 class ToolSelector {
     get versionsDirectoryPath() {
         return path.join(this.basePath, 'Versions');
@@ -127,7 +112,20 @@ class ToolSelector {
         // filter such symlinks and look for only real versions
         let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory()).map(child => child.name);
         potentialVersions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
-        return potentialVersions.sort(compare_versions_1.default);
+        // sort versions array by descending to make sure that the newest version will be picked up
+        return potentialVersions.sort(compare_versions_1.default).reverse();
+    }
+    findVersion(versionSpec) {
+        var _a;
+        const availableVersions = this.getAllVersions();
+        if (availableVersions.length === 0) {
+            throw new Error('');
+        }
+        if (versionSpec === 'latest') {
+            return availableVersions[0];
+        }
+        const normalizedVersionSpec = version_utils_1.VersionUtils.normalizeVersion(versionSpec);
+        return (_a = availableVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='))) !== null && _a !== void 0 ? _a : null;
     }
     setVersion(version) {
         const targetVersionDirectory = this.getVersionPath(version);
@@ -184,7 +182,7 @@ const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const tool_selector_1 = __webpack_require__(136);
-const version_matcher_1 = __webpack_require__(846);
+const version_utils_1 = __webpack_require__(957);
 class MonoToolSelector extends tool_selector_1.ToolSelector {
     get basePath() {
         return '/Library/Frameworks/Mono.framework';
@@ -203,7 +201,7 @@ class MonoToolSelector extends tool_selector_1.ToolSelector {
     }
     setVersion(version) {
         // for Mono, version folder contains only 3 digits instead of full version
-        version = version_matcher_1.cutVersionLength(version, 3);
+        version = version_utils_1.VersionUtils.cutVersionLength(version, 3);
         super.setVersion(version);
         const versionDirectory = this.getVersionPath(version);
         core.exportVariable('DYLD_LIBRARY_FALLBACK_PATH', [
@@ -373,9 +371,8 @@ const mono_selector_1 = __webpack_require__(220);
 const xamarin_ios_selector_1 = __webpack_require__(497);
 const xamarin_mac_selector_1 = __webpack_require__(116);
 const xamarin_android_selector_1 = __webpack_require__(182);
-const version_matcher_1 = __webpack_require__(846);
 const os_1 = __webpack_require__(87);
-const constants_1 = __webpack_require__(32);
+const version_utils_1 = __webpack_require__(957);
 let showVersionMajorMinorWarning = false;
 const invokeSelector = (variableName, selectorClass) => {
     const versionSpec = core.getInput(variableName, { required: false });
@@ -383,24 +380,22 @@ const invokeSelector = (variableName, selectorClass) => {
         return;
     }
     const selector = new selectorClass();
-    core.info(`Switching ${selector.toolName} to version ${versionSpec}...`);
-    const normalizedVersionSpec = version_matcher_1.normalizeVersion(versionSpec);
-    if (!normalizedVersionSpec) {
+    if (!version_utils_1.VersionUtils.validVersion(versionSpec)) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
-    core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
-    const availableVersions = selector.getAllVersions();
-    const targetVersion = version_matcher_1.matchVersion(availableVersions, normalizedVersionSpec);
+    core.info(`Switching ${selector.toolName} to version '${versionSpec}'...`);
+    const targetVersion = selector.findVersion(versionSpec);
     if (!targetVersion) {
         throw new Error([
-            `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`,
+            `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec}`,
             'Available versions:',
-            ...availableVersions.map(ver => `- ${ver}`)
+            ...selector.getAllVersions().map(ver => `- ${ver}`)
         ].join(os_1.EOL));
     }
+    core.debug(`${selector.toolName} ${targetVersion} will be set`);
     selector.setVersion(targetVersion);
     core.info(`${selector.toolName} is set to ${targetVersion}`);
-    showVersionMajorMinorWarning = showVersionMajorMinorWarning || version_matcher_1.countVersionDigits(versionSpec) > 2;
+    showVersionMajorMinorWarning = showVersionMajorMinorWarning || version_utils_1.VersionUtils.countVersionLength(versionSpec) > 2;
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -413,7 +408,11 @@ function run() {
             invokeSelector('xamarin-mac-version', xamarin_mac_selector_1.XamarinMacToolSelector);
             invokeSelector('xamarin-android-version', xamarin_android_selector_1.XamarinAndroidToolSelector);
             if (showVersionMajorMinorWarning) {
-                core.warning(constants_1.WarningMessageMajorMinorVersions);
+                core.warning([
+                    `It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`,
+                    `Hosted VMs contain the latest patch & build version for each major & minor pair.`,
+                    `It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`
+                ].join(' '));
             }
         }
         catch (error) {
@@ -796,7 +795,7 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 846:
+/***/ 957:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -806,45 +805,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const compare_versions_1 = __importDefault(__webpack_require__(247));
-const constants_1 = __webpack_require__(32);
-exports.normalizeVersion = (version) => {
-    if (version === constants_1.LatestVersionKeyword) {
-        return 'x.x.x.x';
-    }
-    if (!compare_versions_1.default.validate(version)) {
-        return null;
-    }
-    const normalizedLength = 4;
-    const parts = version.split('.');
-    while (parts.length < normalizedLength) {
-        parts.push('x');
-    }
-    return parts.join('.');
+class VersionUtils {
+}
+exports.VersionUtils = VersionUtils;
+VersionUtils.validVersion = (version) => {
+    return compare_versions_1.default.validate(version);
 };
-exports.countVersionDigits = (version) => {
-    if (!compare_versions_1.default.validate(version)) {
-        return 0;
+VersionUtils.normalizeVersion = (version) => {
+    const versionParts = VersionUtils.splitVersionToParts(version);
+    while (versionParts.length < 4) {
+        versionParts.push('x');
     }
-    const parts = version.split('.');
-    return parts.length;
+    return versionParts.join('.');
 };
-exports.cutVersionLength = (version, newLength) => {
-    const parts = version.split('.');
-    const newParts = parts.slice(0, newLength);
-    return newParts.join('.');
+VersionUtils.countVersionLength = (version) => {
+    return VersionUtils.splitVersionToParts(version).length;
 };
-exports.matchVersion = (availableVersions, versionSpec) => {
-    const normalizedVersionSpec = exports.normalizeVersion(versionSpec);
-    if (!normalizedVersionSpec) {
-        return null;
-    }
-    // sort versions array by descending to make sure that the newest version will be picked up
-    const sortedVersions = availableVersions.sort(compare_versions_1.default).reverse();
-    const version = sortedVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, '='));
-    if (version) {
-        return version;
-    }
-    return null;
+VersionUtils.cutVersionLength = (version, newLength) => {
+    const versionParts = VersionUtils.splitVersionToParts(version);
+    const newParts = versionParts.slice(0, newLength);
+    return VersionUtils.buildVersionFromParts(newParts);
+};
+VersionUtils.splitVersionToParts = (version) => {
+    return version.split('.');
+};
+VersionUtils.buildVersionFromParts = (versionParts) => {
+    return versionParts.join('.');
 };
 
 

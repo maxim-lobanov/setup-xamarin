@@ -4,9 +4,8 @@ import { XamarinIosToolSelector } from './xamarin-ios-selector';
 import { XamarinMacToolSelector } from './xamarin-mac-selector';
 import { XamarinAndroidToolSelector } from './xamarin-android-selector';
 import { ToolSelector } from './tool-selector';
-import { countVersionDigits, matchVersion, normalizeVersion } from './version-matcher';
 import { EOL } from 'os';
-import { WarningMessageMajorMinorVersions } from './constants';
+import { VersionUtils } from './version-utils';
 
 let showVersionMajorMinorWarning = false;
 
@@ -17,31 +16,29 @@ const invokeSelector = (variableName: string, selectorClass: { new (): ToolSelec
     }
 
     const selector = new selectorClass();
-    core.info(`Switching ${selector.toolName} to version ${versionSpec}...`);
 
-    const normalizedVersionSpec = normalizeVersion(versionSpec);
-    if (!normalizedVersionSpec) {
+    if (!VersionUtils.validVersion(versionSpec)) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
-    core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
 
-    const availableVersions = selector.getAllVersions();
+    core.info(`Switching ${selector.toolName} to version '${versionSpec}'...`);
 
-    const targetVersion = matchVersion(availableVersions, normalizedVersionSpec);
+    const targetVersion = selector.findVersion(versionSpec);
     if (!targetVersion) {
         throw new Error(
             [
-                `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec} (${normalizedVersionSpec})`,
+                `Could not find ${selector.toolName} version that satisfied version spec: ${versionSpec}`,
                 'Available versions:',
-                ...availableVersions.map(ver => `- ${ver}`)
+                ...selector.getAllVersions().map(ver => `- ${ver}`)
             ].join(EOL)
         );
     }
 
+    core.debug(`${selector.toolName} ${targetVersion} will be set`);
     selector.setVersion(targetVersion);
     core.info(`${selector.toolName} is set to ${targetVersion}`);
 
-    showVersionMajorMinorWarning = showVersionMajorMinorWarning || countVersionDigits(versionSpec) > 2;
+    showVersionMajorMinorWarning = showVersionMajorMinorWarning || VersionUtils.countVersionLength(versionSpec) > 2;
 };
 
 async function run() {
@@ -56,7 +53,13 @@ async function run() {
         invokeSelector('xamarin-android-version', XamarinAndroidToolSelector);
 
         if (showVersionMajorMinorWarning) {
-            core.warning(WarningMessageMajorMinorVersions);
+            core.warning(
+                [
+                    `It is recommended to specify only major and minor versions of tool (like '13' or '13.2').`,
+                    `Hosted VMs contain the latest patch & build version for each major & minor pair.`,
+                    `It means that version '13.2.1.4' can be replaced by '13.2.2.0' without any notice and your pipeline will start failing.`
+                ].join(' ')
+            );
         }
     } catch (error) {
         core.setFailed(error.message);

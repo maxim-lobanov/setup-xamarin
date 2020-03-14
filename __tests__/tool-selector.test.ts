@@ -7,6 +7,7 @@ import { XamarinMacToolSelector } from '../src/xamarin-mac-selector';
 import { XamarinAndroidToolSelector } from '../src/xamarin-android-selector';
 import { ToolSelector } from '../src/tool-selector';
 import * as utils from '../src/utils';
+import compareVersions from 'compare-versions';
 
 const selectors: { new (): ToolSelector }[] = [
     MonoToolSelector, //
@@ -60,11 +61,48 @@ selectors.forEach(selector => {
             it('versions are filtered correctly', () => {
                 const sel = new selector();
                 const expectedVersions = [
-                    '13.4.0.2', //
+                    '13.10.0.21',
                     '13.6.0.12',
-                    '13.10.0.21'
+                    '13.4.0.2'
                 ];
                 expect(sel.getAllVersions()).toEqual(expectedVersions);
+            });
+        });
+
+        describe('findVersion', () => {
+            const mockedVersions = [
+                '13.2.0.47',
+                '13.4.0.2',
+                '13.6.0.12',
+                '13.8.2.9',
+                '13.8.3.0',
+                '13.8.3.2',
+                '13.9.1.0',
+                '13.10.0.21',
+                '14.0.2.1'
+            ].sort(compareVersions).reverse();
+
+            it.each(<[string, string | null, string][]>[
+                ['latest', '14.0.2.1', 'latest is matched'],
+                ['14', '14.0.2.1', 'one digit is matched'],
+                ['13', '13.10.0.21', 'one digit is matched and latest version is selected'],
+                ['11', null, 'one digit is not matched'],
+                ['14.0', '14.0.2.1', 'two digits are matched'],
+                ['13.8', '13.8.3.2', 'two digits are matched and latest version is selected'],
+                ['13.7', null, 'two digits are not matched'],
+                ['11.0', null, 'two digits are not matched'],
+                ['13.2.0', '13.2.0.47', 'three digits are matched'],
+                ['13.8.3', '13.8.3.2', 'three digits are matched and latest version is selected'],
+                ['11.0.2', null, 'three digits are not matched'],
+                ['13.5.4', null, 'three digits are not matched'],
+                ['13.8.1', null, 'three digits are not matched'],
+                ['13.9.1.0', '13.9.1.0', 'four digits are matched'],
+                ['13.10.0.22', null, 'four digits are not matched']
+            ])(`'%s' -> '%s' (%s)`, (versionSpec: string, expected: string | null) => {
+                const sel = new selector();
+                sel.getAllVersions = () => mockedVersions;
+                const matchedVersion = sel.findVersion(versionSpec);
+                expect(matchedVersion).toBe(expected);
             });
         });
 
