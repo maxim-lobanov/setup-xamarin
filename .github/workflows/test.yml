@@ -1,4 +1,4 @@
-name: Validate 'setup-xamarin' task (all test cases)
+name: Validate 'setup-xamarin' (all test cases)
 on: [pull_request]
 
 jobs:
