@@ -1,4 +1,4 @@
-name: Validate 'setup-xamarin' (all test cases)
+name: Validate 'setup-xamarin'
 on:
   pull_request:
   schedule:
