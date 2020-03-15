@@ -1,11 +1,11 @@
 import compareVersions from "compare-versions";
 
 export class VersionUtils {
-    public static validVersion = (version: string): boolean => {
+    public static isValidVersion = (version: string): boolean => {
         return compareVersions.validate(version);
     }
 
-    public static latestVersionKeyword = (version: string): boolean => {
+    public static isLatestVersionKeyword = (version: string): boolean => {
         return version === "latest";
     }
 

@@ -17,7 +17,7 @@ const invokeSelector = (variableName: string, toolSelector: { new (): ToolSelect
 
     const selector = new toolSelector();
 
-    if (!VersionUtils.latestVersionKeyword(versionSpec) && !VersionUtils.validVersion(versionSpec)) {
+    if (!VersionUtils.isLatestVersionKeyword(versionSpec) && !VersionUtils.isValidVersion(versionSpec)) {
         throw new Error(`Value '${versionSpec}' is not valid version for ${selector.toolName}`);
     }
 

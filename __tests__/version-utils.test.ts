@@ -11,7 +11,7 @@ describe("VersionUtils", () => {
             ["invalid_version_format", false],
             ["", false]
         ])("'%s' -> %s", (version: string, expected: boolean) => {
-            expect(VersionUtils.validVersion(version)).toBe(expected);
+            expect(VersionUtils.isValidVersion(version)).toBe(expected);
         });
     });
 
