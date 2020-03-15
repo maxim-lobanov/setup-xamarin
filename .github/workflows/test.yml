@@ -1,0 +1,55 @@
+name: Validate 'setup-xamarin'
+on:
+  pull_request:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  partial-versions:
+    name: valid versions (should pass)
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: setup-xamarin
+      uses: ./
+      with:
+        mono-version: 6.6
+        xamarin-ios-version: 13.8
+        xamarin-mac-version: 6.6
+        xamarin-android-version: 10.1
+
+    - name: Validate versions
+      run: ./__tests__/validate-versions.sh '6.6' '13.8' '6.6' '10.1'
+
+  latest-keyword:
+    name: latest keyword (should pass)
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: setup-xamarin
+      uses: ./
+      with:
+        mono-version: latest
+        xamarin-ios-version: latest
+        xamarin-mac-version: latest
+        xamarin-android-version: latest
+
+  full-versions:
+    name: valid full versions (should warn)
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: setup-xamarin
+      uses: ./
+      with:
+        xamarin-ios-version: 13.10.0.21
+        xamarin-mac-version: 6.6.0.12
+
+    - name: Validate versions
+      run: ./__tests__/validate-versions.sh '6.6.0' '13.10.0.21' '6.6.0.12' '10.1.3'
