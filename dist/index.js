@@ -56,8 +56,8 @@ module.exports = require("os");
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const tool_selector_1 = __webpack_require__(136);
-class XamarinMacToolSelector extends tool_selector_1.ToolSelector {
+const xamarin_selector_1 = __webpack_require__(792);
+class XamarinMacToolSelector extends xamarin_selector_1.XamarinSelector {
     get toolName() {
         return "Xamarin.Mac";
     }
@@ -77,87 +77,14 @@ module.exports = require("child_process");
 
 /***/ }),
 
-/***/ 136:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const path = __importStar(__webpack_require__(622));
-const core = __importStar(__webpack_require__(470));
-const compare_versions_1 = __importDefault(__webpack_require__(247));
-const utils_1 = __webpack_require__(611);
-const version_utils_1 = __webpack_require__(957);
-class ToolSelector {
-    get versionsDirectoryPath() {
-        return path.join(this.basePath, "Versions");
-    }
-    getVersionPath(version) {
-        return path.join(this.versionsDirectoryPath, version);
-    }
-    getAllVersions() {
-        const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: "utf8", withFileTypes: true });
-        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
-        // filter such symlinks and look for only real versions
-        let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory()).map(child => child.name);
-        potentialVersions = potentialVersions.filter(child => compare_versions_1.default.validate(child));
-        // sort versions array by descending to make sure that the newest version will be picked up
-        return potentialVersions.sort(compare_versions_1.default).reverse();
-    }
-    findVersion(versionSpec) {
-        var _a;
-        const availableVersions = this.getAllVersions();
-        if (availableVersions.length === 0) {
-            return null;
-        }
-        if (version_utils_1.VersionUtils.isLatestVersionKeyword(versionSpec)) {
-            return availableVersions[0];
-        }
-        const normalizedVersionSpec = version_utils_1.VersionUtils.normalizeVersion(versionSpec);
-        core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
-        return (_a = availableVersions.find(ver => compare_versions_1.default.compare(ver, normalizedVersionSpec, "="))) !== null && _a !== void 0 ? _a : null;
-    }
-    setVersion(version) {
-        const targetVersionDirectory = this.getVersionPath(version);
-        if (!fs.existsSync(targetVersionDirectory)) {
-            throw new Error(`Invalid version: Directory '${targetVersionDirectory}' doesn't exist`);
-        }
-        const currentVersionDirectory = path.join(this.versionsDirectoryPath, "Current");
-        core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
-        if (fs.existsSync(currentVersionDirectory)) {
-            utils_1.invokeCommandSync("rm", ["-f", currentVersionDirectory], true);
-        }
-        utils_1.invokeCommandSync("ln", ["-s", targetVersionDirectory, currentVersionDirectory], true);
-    }
-    static toString() {
-        // show correct name for test suite
-        return this.name;
-    }
-}
-exports.ToolSelector = ToolSelector;
-
-
-/***/ }),
-
 /***/ 182:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const tool_selector_1 = __webpack_require__(136);
-class XamarinAndroidToolSelector extends tool_selector_1.ToolSelector {
+const xamarin_selector_1 = __webpack_require__(792);
+class XamarinAndroidToolSelector extends xamarin_selector_1.XamarinSelector {
     get toolName() {
         return "Xamarin.Android";
     }
@@ -186,9 +113,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
-const tool_selector_1 = __webpack_require__(136);
+const xamarin_selector_1 = __webpack_require__(792);
 const version_utils_1 = __webpack_require__(957);
-class MonoToolSelector extends tool_selector_1.ToolSelector {
+class MonoToolSelector extends xamarin_selector_1.XamarinSelector {
     get basePath() {
         return "/Library/Frameworks/Mono.framework";
     }
@@ -369,6 +296,7 @@ const xamarin_mac_selector_1 = __webpack_require__(116);
 const xamarin_android_selector_1 = __webpack_require__(182);
 const os_1 = __webpack_require__(87);
 const version_utils_1 = __webpack_require__(957);
+const xcode_selector_1 = __webpack_require__(670);
 let showVersionMajorMinorWarning = false;
 const invokeSelector = (variableName, toolSelector) => {
     const versionSpec = core.getInput(variableName, { required: false });
@@ -402,6 +330,7 @@ const run = () => {
         invokeSelector("xamarin-ios-version", xamarin_ios_selector_1.XamarinIosToolSelector);
         invokeSelector("xamarin-mac-version", xamarin_mac_selector_1.XamarinMacToolSelector);
         invokeSelector("xamarin-android-version", xamarin_android_selector_1.XamarinAndroidToolSelector);
+        invokeSelector("xcode-version", xcode_selector_1.XcodeSelector);
         if (showVersionMajorMinorWarning) {
             core.warning([
                 "It is recommended to specify only major and minor versions of tool (like '13' or '13.2').",
@@ -726,8 +655,8 @@ exports.getState = getState;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const tool_selector_1 = __webpack_require__(136);
-class XamarinIosToolSelector extends tool_selector_1.ToolSelector {
+const xamarin_selector_1 = __webpack_require__(792);
+class XamarinIosToolSelector extends xamarin_selector_1.XamarinSelector {
     get toolName() {
         return "Xamarin.iOS";
     }
@@ -755,17 +684,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const child = __importStar(__webpack_require__(129));
 const os_1 = __webpack_require__(87);
-exports.invokeCommandSync = (command, args, sudo) => {
+exports.invokeCommandSync = (command, args, options) => {
     let execResult;
-    if (sudo) {
+    if (options.sudo) {
         execResult = child.spawnSync("sudo", [command, ...args]);
     }
     else {
         execResult = child.spawnSync(command, args);
     }
     if (execResult.status !== 0) {
+        const fullCommand = `${options.sudo ? "sudo " : ""}${command} ${args.join(" ")}`;
         throw new Error([
-            `Error during run ${sudo ? "sudo " : ""}${command} ${args.join(" ")}`,
+            `Error during run '${fullCommand}'`,
             execResult.stderr,
             execResult.stdout
         ].join(os_1.EOL));
@@ -782,10 +712,154 @@ module.exports = require("path");
 
 /***/ }),
 
+/***/ 670:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
+const version_utils_1 = __webpack_require__(957);
+const utils = __importStar(__webpack_require__(611));
+class XcodeSelector {
+    constructor() {
+        this.xcodeDirectoryPath = "/Applications";
+        this.xcodeFilenameRegex = /Xcode_([\d.]+)(_beta)?\.app/;
+    }
+    parseXcodeVersionFromFilename(filename) {
+        const match = filename.match(this.xcodeFilenameRegex);
+        if (!match || match.length < 2) {
+            return null;
+        }
+        return match[1];
+    }
+    get toolName() {
+        return "Xcode";
+    }
+    getVersionPath(version) {
+        return path.join(this.xcodeDirectoryPath, `Xcode_${version}.app`);
+    }
+    getAllVersions() {
+        const children = fs.readdirSync(this.xcodeDirectoryPath, { encoding: "utf8", withFileTypes: true });
+        let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory()).map(child => child.name);
+        potentialVersions = potentialVersions.map(child => this.parseXcodeVersionFromFilename(child)).filter((child) => !!child);
+        const stableVersions = potentialVersions.filter(ver => version_utils_1.VersionUtils.isValidVersion(ver));
+        const betaVersions = potentialVersions.filter(ver => ver.endsWith("_beta")).map(ver => {
+            var _a;
+            const verWithoutBeta = ver.substr(0, ver.length - 5);
+            return (_a = children.find(child => child.isSymbolicLink() && this.parseXcodeVersionFromFilename(child.name) === verWithoutBeta)) === null || _a === void 0 ? void 0 : _a.name;
+        }).filter(((ver) => !!ver && version_utils_1.VersionUtils.isValidVersion(ver)));
+        // sort versions array by descending to make sure that the newest version will be picked up
+        return version_utils_1.VersionUtils.sortVersions([...stableVersions, ...betaVersions]);
+    }
+    findVersion(versionSpec) {
+        var _a;
+        const availableVersions = this.getAllVersions();
+        if (availableVersions.length === 0) {
+            return null;
+        }
+        if (version_utils_1.VersionUtils.isLatestVersionKeyword(versionSpec)) {
+            return availableVersions[0];
+        }
+        return (_a = availableVersions.find(ver => version_utils_1.VersionUtils.isVersionsEqual(ver, versionSpec))) !== null && _a !== void 0 ? _a : null;
+    }
+    setVersion(version) {
+        const targetVersionDirectory = this.getVersionPath(version);
+        if (!fs.existsSync(targetVersionDirectory)) {
+            throw new Error(`Invalid version: Directory '${targetVersionDirectory}' doesn't exist`);
+        }
+        core.debug(`sudo xcode-select -s ${targetVersionDirectory}`);
+        utils.invokeCommandSync("xcode-select", ["-s", targetVersionDirectory], { sudo: true });
+        core.exportVariable("MD_APPLE_SDK_ROOT", targetVersionDirectory);
+    }
+}
+exports.XcodeSelector = XcodeSelector;
+
+
+/***/ }),
+
 /***/ 747:
 /***/ (function(module) {
 
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 792:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
+const utils = __importStar(__webpack_require__(611));
+const version_utils_1 = __webpack_require__(957);
+class XamarinSelector {
+    get versionsDirectoryPath() {
+        return path.join(this.basePath, "Versions");
+    }
+    getVersionPath(version) {
+        return path.join(this.versionsDirectoryPath, version);
+    }
+    getAllVersions() {
+        const children = fs.readdirSync(this.versionsDirectoryPath, { encoding: "utf8", withFileTypes: true });
+        // macOS image contains symlinks for full versions, like '13.2' -> '13.2.3.0'
+        // filter such symlinks and look for only real versions
+        let potentialVersions = children.filter(child => !child.isSymbolicLink() && child.isDirectory()).map(child => child.name);
+        potentialVersions = potentialVersions.filter(child => version_utils_1.VersionUtils.isValidVersion(child));
+        // sort versions array by descending to make sure that the newest version will be picked up
+        return version_utils_1.VersionUtils.sortVersions(potentialVersions);
+    }
+    findVersion(versionSpec) {
+        var _a;
+        const availableVersions = this.getAllVersions();
+        if (availableVersions.length === 0) {
+            return null;
+        }
+        if (version_utils_1.VersionUtils.isLatestVersionKeyword(versionSpec)) {
+            return availableVersions[0];
+        }
+        const normalizedVersionSpec = version_utils_1.VersionUtils.normalizeVersion(versionSpec);
+        core.debug(`Semantic version spec of '${versionSpec}' is '${normalizedVersionSpec}'`);
+        return (_a = availableVersions.find(ver => version_utils_1.VersionUtils.isVersionsEqual(ver, normalizedVersionSpec))) !== null && _a !== void 0 ? _a : null;
+    }
+    setVersion(version) {
+        const targetVersionDirectory = this.getVersionPath(version);
+        if (!fs.existsSync(targetVersionDirectory)) {
+            throw new Error(`Invalid version: Directory '${targetVersionDirectory}' doesn't exist`);
+        }
+        const currentVersionDirectory = path.join(this.versionsDirectoryPath, "Current");
+        core.debug(`Creating symlink '${currentVersionDirectory}' -> '${targetVersionDirectory}'`);
+        if (fs.existsSync(currentVersionDirectory)) {
+            utils.invokeCommandSync("rm", ["-f", currentVersionDirectory], { sudo: true });
+        }
+        utils.invokeCommandSync("ln", ["-s", targetVersionDirectory, currentVersionDirectory], { sudo: true });
+    }
+    static toString() {
+        // show correct name for test suite
+        return this.name;
+    }
+}
+exports.XamarinSelector = XamarinSelector;
+
 
 /***/ }),
 
@@ -807,6 +881,12 @@ VersionUtils.isValidVersion = (version) => {
 };
 VersionUtils.isLatestVersionKeyword = (version) => {
     return version === "latest";
+};
+VersionUtils.isVersionsEqual = (firstVersion, secondVersion) => {
+    return compare_versions_1.default.compare(firstVersion, secondVersion, "=");
+};
+VersionUtils.sortVersions = (versions) => {
+    return [...versions].sort(compare_versions_1.default).reverse();
 };
 VersionUtils.normalizeVersion = (version) => {
     const versionParts = VersionUtils.splitVersionToParts(version);

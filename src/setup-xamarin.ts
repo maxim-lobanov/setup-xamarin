@@ -6,6 +6,7 @@ import { XamarinAndroidToolSelector } from "./xamarin-android-selector";
 import { EOL } from "os";
 import { VersionUtils } from "./version-utils";
 import { ToolSelector } from "./tool-selector";
+import { XcodeSelector } from "./xcode-selector";
 
 let showVersionMajorMinorWarning = false;
 
@@ -51,6 +52,7 @@ const run = (): void => {
         invokeSelector("xamarin-ios-version", XamarinIosToolSelector);
         invokeSelector("xamarin-mac-version", XamarinMacToolSelector);
         invokeSelector("xamarin-android-version", XamarinAndroidToolSelector);
+        invokeSelector("xcode-version", XcodeSelector);
 
         if (showVersionMajorMinorWarning) {
             core.warning(

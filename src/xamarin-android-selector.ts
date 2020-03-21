@@ -1,6 +1,6 @@
-import { ToolSelector } from "./tool-selector";
+import { XamarinSelector } from "./xamarin-selector";
 
-export class XamarinAndroidToolSelector extends ToolSelector {
+export class XamarinAndroidToolSelector extends XamarinSelector {
     public get toolName(): string {
         return "Xamarin.Android";
     }

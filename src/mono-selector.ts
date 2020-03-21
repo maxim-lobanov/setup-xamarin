@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
-import { ToolSelector } from "./tool-selector";
+import { XamarinSelector } from "./xamarin-selector";
 import { VersionUtils } from "./version-utils";
 
-export class MonoToolSelector extends ToolSelector {
+export class MonoToolSelector extends XamarinSelector {
     protected get basePath(): string {
         return "/Library/Frameworks/Mono.framework";
     }

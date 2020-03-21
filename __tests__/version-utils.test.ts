@@ -15,6 +15,38 @@ describe("VersionUtils", () => {
         });
     });
 
+    it("sortVersions", () => {
+        const actual = VersionUtils.sortVersions([
+            "11.2",
+            "11.4",
+            "10.1",
+            "11.2.1",
+            "10.2"
+        ]);
+        expect(actual).toEqual([
+            "11.4",
+            "11.2.1",
+            "11.2",
+            "10.2",
+            "10.1"
+        ]);
+    });
+
+    describe("isVersionsEqual", () => {
+        it.each([
+            ["11.2", "11.2", true],
+            ["11.x", "11.2", true],
+            ["11.x.x", "11.2", true],
+            ["11.x.x", "11.2.1", true],
+            ["11", "11.2", false],
+            ["11", "11.2.1", false],
+            ["10", "11.2", false]
+        ])("'%s', '%s' -> %s", (firstVersion: string, secondVersion: string, expected: boolean) => {
+            const actual = VersionUtils.isVersionsEqual(firstVersion, secondVersion);
+            expect(actual).toBe(expected);
+        });
+    });
+
     describe("normalizeVersion", () => {
         it.each([
             ["5", "5.x.x.x"],

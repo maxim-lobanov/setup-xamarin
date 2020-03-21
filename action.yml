@@ -14,6 +14,9 @@ inputs:
   xamarin-android-version:
     description: 'Version of Xamarin.Android to select'
     required: false
+  xcode-version:
+    description: 'Version of Xcode to use with Xamarin.iOS and Xamarin.Mac'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
