@@ -21,7 +21,7 @@ jobs:
         xamarin-android-version: 10.1
 
     - name: Validate versions
-      run: ./__tests__/validate-xamarin-versions.ps1 "6.6" "13.8" "6.6" "10.1"
+      run: pwsh ./__tests__/validate-xamarin-versions.ps1 "6.6" "13.8" "6.6" "10.1"
 
   xamarin-latest-keyword:
     name: xamarin - latest keyword
@@ -52,7 +52,7 @@ jobs:
         xamarin-mac-version: 6.6.0.12
 
     - name: Validate versions
-      run: ./__tests__/validate-xamarin-versions.ps1 -XamarinIOSVersion "13.10.0.21" -XamarinMacVersion "6.6.0.12"
+      run: pwsh ./__tests__/validate-xamarin-versions.ps1 -XamarinIOSVersion "13.10.0.21" -XamarinMacVersion "6.6.0.12"
 
   xcode-full-version:
     name: xcode - valid version
@@ -67,10 +67,10 @@ jobs:
         xcode-version: 11.4
 
     - name: Validate versions
-      run: ./__tests__/validate-xcode-version.ps1 -XcodeVersion "11.4"
+      run: pwsh ./__tests__/validate-xcode-version.ps1 -XcodeVersion "11.4"
 
   xcode-wildcard-version:
-    name: xcode - valid version
+    name: xcode - wildcard version
     runs-on: macos-latest
     steps:
     - name: Checkout

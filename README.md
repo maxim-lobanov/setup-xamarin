@@ -1,15 +1,17 @@
 # setup-xamarin
-This action is intended to switch between pre-installed versions Xamarin & Mono on macos-10.15 image in GitHub Actions.  
-The list of available versions can be found in [virtual-environments](https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#mono) repository.
-# Available parameters
-| Argument                | Required | Description                                      |
-|-------------------------|----------|--------------------------------------------------|
-| mono-version            | False    | Specify the version of Mono to switch            |
-| xamarin-ios-version     | False    | Specify the version of Xamarin.iOS to switch     |
-| xamarin-mac-version     | False    | Specify the version of Xamarin.Mac to switch     |
-| xamarin-android-version | False    | Specify the version of Xamarin.Android to switch |
+This action is intended to switch between pre-installed versions of Xamarin and Mono for macOS images in GitHub Actions.  
 
-All fields support the following format: `latest`, `13`, `13.2`, `13.2.1.4`
+# Available parameters
+| Argument                | Required | Description                                               | Available versions |
+|-------------------------|----------|-----------------------------------------------------------|--------------------|
+| mono-version            | False    | Specify the version of Mono to switch                     | [Link](https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#mono) |
+| xamarin-ios-version     | False    | Specify the version of Xamarin.iOS to switch              | [Link](https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#xamarinios) |
+| xamarin-mac-version     | False    | Specify the version of Xamarin.Mac to switch              | [Link](https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#xamarinmac) |
+| xamarin-android-version | False    | Specify the version of Xamarin.Android to switch          | [Link](https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#xamarinandroid) |
+| xcode-version           | False    | Specify the Xcode to use with Xamarin.iOS and Xamarin.Mac | [Link](https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#xcode) |
+
+- `mono-version`, `xamarin-ios-version`, `xamarin-mac-version`, `xamarin-android-version` parameters support the following format: `latest`, `13`, `13.2`, `13.2.1.4`  
+- `xcode-version` parameter supports the following format: `latest`, `11.4`, `11.x`, `11.2.1`  
 
 # Usage
 ```
@@ -30,6 +32,7 @@ jobs:
         xamarin-ios-version: 13 # specify version in '<major>' format
         xamarin-mac-version: latest # specify 'latest' keyword to pick up the latest available version
         xamarin-android-version: 10.1.3.7 # specify full version; it is not recomended option because your pipeline can be broken suddenly in future
+        xcode-version: 11.x # set the latest available Xcode 11
 ```
 
 # License
