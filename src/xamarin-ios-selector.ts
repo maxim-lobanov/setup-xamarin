@@ -1,6 +1,6 @@
-import { ToolSelector } from "./tool-selector";
+import { XamarinSelector } from "./xamarin-selector";
 
-export class XamarinIosToolSelector extends ToolSelector {
+export class XamarinIosToolSelector extends XamarinSelector {
     public get toolName(): string {
         return "Xamarin.iOS";
     }

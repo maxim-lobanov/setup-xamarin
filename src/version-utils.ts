@@ -9,6 +9,14 @@ export class VersionUtils {
         return version === "latest";
     }
 
+    public static isVersionsEqual = (firstVersion: string, secondVersion: string): boolean => {
+        return compareVersions.compare(firstVersion, secondVersion, "=");
+    }
+
+    public static sortVersions = (versions: string[]): string[] => {
+        return [...versions].sort(compareVersions).reverse();
+    }
+
     public static normalizeVersion = (version: string): string => {
         const versionParts = VersionUtils.splitVersionToParts(version);
         while (versionParts.length < 4) {

@@ -1,13 +1,13 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
+import * as utils from "../src/utils";
 import { MonoToolSelector } from "../src/mono-selector";
 import { XamarinIosToolSelector } from "../src/xamarin-ios-selector";
 import { XamarinMacToolSelector } from "../src/xamarin-mac-selector";
 import { XamarinAndroidToolSelector } from "../src/xamarin-android-selector";
-import * as utils from "../src/utils";
-import compareVersions from "compare-versions";
 import { ToolSelector } from "../src/tool-selector";
+import { VersionUtils } from "../src/version-utils";
 
 jest.mock("fs");
 jest.mock("@actions/core");
@@ -35,7 +35,7 @@ const fakeReadDirResults = [
     buildFsDirentItem("Latest", { isSymbolicLink: false, isDirectory: false })
 ];
 
-const fakeGetVersionsResult = [
+const fakeGetVersionsResult = VersionUtils.sortVersions([
     "13.2.0.47",
     "13.4.0.2",
     "13.6.0.12",
@@ -45,7 +45,7 @@ const fakeGetVersionsResult = [
     "13.9.1.0",
     "13.10.0.21",
     "14.0.2.1"
-].sort(compareVersions).reverse();
+]);
 
 describe.each([
     MonoToolSelector,
@@ -122,7 +122,7 @@ describe.each([
             const sel = new selectorClass();
             sel.setVersion("1.2.3.4");
             expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(1);
-            expect(fsInvokeCommandSpy).toHaveBeenCalledWith("ln", expect.any(Array), true);
+            expect(fsInvokeCommandSpy).toHaveBeenCalledWith("ln", expect.any(Array), expect.any(Object));
         });
 
         it("symlink is recreated", () => {
@@ -130,8 +130,8 @@ describe.each([
             const sel = new selectorClass();
             sel.setVersion("1.2.3.4");
             expect(fsInvokeCommandSpy).toHaveBeenCalledTimes(2);
-            expect(fsInvokeCommandSpy).toHaveBeenCalledWith("rm", expect.any(Array), true);
-            expect(fsInvokeCommandSpy).toHaveBeenCalledWith("ln", expect.any(Array), true);
+            expect(fsInvokeCommandSpy).toHaveBeenCalledWith("rm", expect.any(Array), expect.any(Object));
+            expect(fsInvokeCommandSpy).toHaveBeenCalledWith("ln", expect.any(Array), expect.any(Object));
         });
 
         it("error is thrown if version doesn't exist", () => {
