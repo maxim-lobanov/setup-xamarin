@@ -34,7 +34,7 @@ export class MonoToolSelector extends XamarinSelector {
         core.exportVariable(
             "DYLD_LIBRARY_FALLBACK_PATH",
             [
-                `${versionDirectory}/lib`, //
+                `${versionDirectory}/lib`,
                 "/lib",
                 "/usr/lib",
                 process.env["DYLD_LIBRARY_FALLBACK_PATH"]
@@ -43,8 +43,7 @@ export class MonoToolSelector extends XamarinSelector {
         core.exportVariable(
             "PKG_CONFIG_PATH",
             [
-                `${versionDirectory}/lib/pkgconfig`, //
-                `${versionDirectory}/share/pkgconfig`,
+                `${versionDirectory}/lib/pkgconfig`,
                 process.env["PKG_CONFIG_PATH"]
             ].join(path.delimiter)
         );
