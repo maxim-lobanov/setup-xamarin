@@ -19,7 +19,7 @@ name: CI
 on: [push]
 jobs:
   build:
-    name: valid versions (should pass)
+    name: Setup Xamarin and Mono versions
     runs-on: macos-latest
     steps:
     - name: Checkout
