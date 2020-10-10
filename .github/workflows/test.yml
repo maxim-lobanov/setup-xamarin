@@ -1,5 +1,8 @@
 name: Validate 'setup-xamarin'
 on:
+  push:
+    branches:
+      - master
   pull_request:
   schedule:
     - cron: 0 0 * * *
@@ -16,12 +19,12 @@ jobs:
       uses: ./
       with:
         mono-version: 6.6
-        xamarin-ios-version: 13.8
+        xamarin-ios-version: 14.0
         xamarin-mac-version: 6.6
         xamarin-android-version: 10.1
 
     - name: Validate versions
-      run: pwsh ./__tests__/validate-xamarin-versions.ps1 "6.6" "13.8" "6.6" "10.1"
+      run: pwsh ./__tests__/validate-xamarin-versions.ps1 "6.6" "14.0" "6.6" "10.1"
 
   xamarin-latest-keyword:
     name: xamarin - latest keyword

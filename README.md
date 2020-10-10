@@ -23,7 +23,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: setup-xamarin
-      uses: maxim-lobanov/setup-xamarin@v1.1
+      uses: maxim-lobanov/setup-xamarin@v1
       with:
         mono-version: 6.6 # specify version in '<major>.<minor>' format
         xamarin-ios-version: 13 # specify version in '<major>' format
