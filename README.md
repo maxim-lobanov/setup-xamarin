@@ -12,6 +12,7 @@ This action is intended to switch between pre-installed versions of Xamarin and 
 
 - `mono-version`, `xamarin-ios-version`, `xamarin-mac-version`, `xamarin-android-version` parameters support the following format: `latest`, `13`, `13.2`, `13.2.1.4`  
 - `xcode-version` parameter supports the following format: `latest`, `11.4`, `11.x`, `11.2.1`  
+**Note:** If you need to switch Xcode only without Xamarin - please consider using [maxim-lobanov/setup-xcode](https://github.com/maxim-lobanov/setup-xcode) actions since it provides more comfortable way to specify Xcode.
 
 # Usage
 ```
