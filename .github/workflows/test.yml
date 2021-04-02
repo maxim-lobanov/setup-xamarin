@@ -4,6 +4,7 @@ on:
     branches:
       - master
   pull_request:
+  workflow_dispatch:
   schedule:
     - cron: 0 0 * * *
 
@@ -18,10 +19,10 @@ jobs:
     - name: setup-xamarin
       uses: ./
       with:
-        mono-version: 6.6
-        xamarin-ios-version: 14.0
-        xamarin-mac-version: 6.6
-        xamarin-android-version: 10.1
+        mono-version: '6.6'
+        xamarin-ios-version: '14.0'
+        xamarin-mac-version: '6.6'
+        xamarin-android-version: '10.1'
 
     - name: Validate versions
       run: pwsh ./__tests__/validate-xamarin-versions.ps1 "6.6" "14.0" "6.6" "10.1"
@@ -67,10 +68,10 @@ jobs:
     - name: setup-xamarin
       uses: ./
       with:
-        xcode-version: 11.4
+        xcode-version: 12.3
 
     - name: Validate versions
-      run: pwsh ./__tests__/validate-xcode-version.ps1 -XcodeVersion "11.4"
+      run: pwsh ./__tests__/validate-xcode-version.ps1 -XcodeVersion "12.3"
 
   xcode-wildcard-version:
     name: xcode - wildcard version
